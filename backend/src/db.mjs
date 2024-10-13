@@ -1,14 +1,15 @@
+// third-party imports -------------------------------------------------------------------------- //
 import dotenv from "dotenv"
 import { MongoClient } from "mongodb"
 
+// set up environment variables
 dotenv.config()
 
-const ATLAS_URI = process.env.ATLAS_URI
+// create mongodb client
+const client = new MongoClient(process.env.ATLAS_URI)
 
-const client = new MongoClient(ATLAS_URI)
-
+// connect to MongoDB
 let conn
-
 try {
     conn = await client.connect()
 
@@ -18,6 +19,7 @@ try {
     console.error(error)
 }
 
+// connect to database
 let db = conn.db("customers")
 
 export default db
