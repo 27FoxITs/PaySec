@@ -10,15 +10,19 @@ import express from "express"
 // local imports -------------------------------------------------------------------------------- //
 import transactions from "./routes/customers/transactions.mjs"
 
+// create app
 const app = express()
 
+// add key and certificate options for ssl
 const options = {
     key: fs.readFileSync("auth/server.key"),
     cert: fs.readFileSync("auth/server.cert"),
 }
 
+// add json middleware to parse json bodies
 app.use(express.json())
 
+// add cors middleware to allow cross-origin requests
 app.use(cors())
 app.use((req, res, next) => {
     res.setHeader("Access-Control-Allow-Origin", "*")
@@ -28,11 +32,9 @@ app.use((req, res, next) => {
     next()
 })
 
+// add routes
 app.use(transactions)
 
+// create https server
 let server = https.createServer(options, app)
-// let server = http.createServer(app)
-
-console.log("Running on port: " + process.env.PORT)
-
 server.listen(process.env.PORT)
