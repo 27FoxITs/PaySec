@@ -107,7 +107,7 @@ transactions.post(ROUTE, async (req, res) => {
     }
 
     // check if provider is a valid provider
-    if (!providers[provider]) {
+    if (!providers.includes(provider)) {
         res.send("Invalid provider").status(400)
 
         return
