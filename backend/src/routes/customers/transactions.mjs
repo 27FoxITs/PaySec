@@ -1,25 +1,28 @@
 // third-party imports -------------------------------------------------------------------------- //
-import currencyapi from "@everapi/currencyapi-js"
 import dotenv from "dotenv"
 import express from "express"
 import { ObjectId } from "mongodb"
 
 // local imports -------------------------------------------------------------------------------- //
-import currencies from "../../data/currencies.mjs"
 import db from "../../db.mjs"
-import providers from "../../data/providers.mjs"
+import currenciesData from "../../data/currencies.json" assert { type: "json" }
+import providersData from "../../data/providers.json" assert { type: "json" }
 
 // set up environment variables
 dotenv.config()
 
-// declare route
-const ROUTE = "/api/customers/transactions"
+// extract data from data files
+const currencies = currenciesData["data"]
+const providers = providersData["data"]
 
 // create router
 const transactions = express.Router()
 
+// declare route
+const route = "/api/customers/transactions"
+
 // GET route
-transactions.get(ROUTE, async (req, res) => {
+transactions.get(route, async (req, res) => {
     const collection = await db.collection("transactions")
     const results = await collection.find({}).toArray()
 
@@ -27,7 +30,7 @@ transactions.get(ROUTE, async (req, res) => {
 })
 
 // POST route
-transactions.post(ROUTE, async (req, res) => {
+transactions.post(route, async (req, res) => {
     // check if any data at all was provided
     if (!req.body) {
         res.send("No data provided").status(400)
