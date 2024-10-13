@@ -31,7 +31,6 @@ app.use((req, res, next) => {
 app.use(transactions)
 
 let server = https.createServer(options, app)
-// let server = http.createServer(app)
 
 console.log("Running on port: " + process.env.PORT)
 
