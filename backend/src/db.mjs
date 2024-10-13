@@ -14,6 +14,7 @@ try {
 
     console.log("Connected to MongoDB")
 } catch (error) {
+    console.error("Unable to connect to MongoDB:")
     console.error(error)
 }
 
