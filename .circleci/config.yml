@@ -28,6 +28,9 @@ jobs:
       - image: sonarsource/sonar-scanner-cli
     resource_class: small
     steps:
+      - run:
+          name: "Install findutils"
+          command: sudo apt-get update && sudo apt-get install -y findutils
       - run: find .
       - attach_workspace:
           at: ~/workspace
