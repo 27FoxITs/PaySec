@@ -38,13 +38,13 @@ jobs:
             echo "Sonar branch value is: $SONAR_BRANCH"
             echo "Sonar org value is: $SONAR_ORG"
             sonar-scanner \
-            -Dsonar.projectKey="$SONAR_PROJECT_KEY" \
-            -Dsonar.organization="$SONAR_ORG" \
-            -Dsonar.host.url=https://sonarcloud.io \
-            -Dsonar.exclusions="**/android/**,**/ios/**" \
-            -Dsonar.login="$SONAR_TOKEN" \
-            -Dsonar.branch.name="$SONAR_BRANCH" \
-            -Dsonar.sources="."
+              -Dsonar.projectKey="$SONAR_PROJECT_KEY" \
+              -Dsonar.organization="$SONAR_ORG" \
+              -Dsonar.host.url=https://sonarcloud.io \
+              -Dsonar.exclusions="**/android/**,**/ios/**" \
+              -Dsonar.login="$SONAR_TOKEN" \
+              -Dsonar.branch.name="$SONAR_BRANCH" \
+              -Dsonar.sources="."
 
 # Orchestrate jobs using workflows
 # See: https://circleci.com/docs/workflows/ & https://circleci.com/docs/configuration-reference/#workflows
