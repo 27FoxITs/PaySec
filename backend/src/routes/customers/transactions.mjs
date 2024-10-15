@@ -5,8 +5,8 @@ import { ObjectId } from "mongodb"
 
 // local imports -------------------------------------------------------------------------------- //
 import db from "../../db.mjs"
-import currenciesData from "../../data/currencies.json" assert { type: "json" }
-import providersData from "../../data/providers.json" assert { type: "json" }
+import currenciesData from "../../data/currencies.json" with { type: "json" }
+import providersData from "../../data/providers.json" with { type: "json" }
 
 // set up environment variables
 dotenv.config()
