@@ -23,6 +23,41 @@ const route = "/api/customers/transactions"
 
 // GET route
 transactions.get(route, async (req, res) => {
+    // check if any data at all was provided
+    if (!req.body) {
+        res.send("No data provided").status(400)
+
+        return
+    }
+
+    // check if the correct amount of keys were provided
+    if (Object.keys(req.body).length == 0) {
+        res.send("Not enough data. Expected 1 key, got " + Object.keys(req.body).length).status(400)
+
+        return
+    } else if (Object.keys(req.body).length > 1) {
+        res.send("Too much data. Expected 1 keys, got " + Object.keys(req.body).length).status(400)
+
+        return
+    }
+
+    // extract data from body
+    const key = req.body.key
+
+    // check if required key was provided
+    if (!key) {
+        res.send("No key provided").status(400)
+
+        return
+    }
+
+    // check if key is a valid key
+    if (key !== process.env.KEY) {
+        res.send("Unauthorized").status(401)
+
+        return
+    }
+
     const collection = await db.collection("transactions")
     const results = await collection.find({}).toArray()
 
