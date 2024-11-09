@@ -29,7 +29,7 @@ const limiter = rateLimit({
     message: "Too many requests from this IP, please try again after 15 minutes",
 })
 
-customers.use(limiter) // apply to all requests
+customers.use(limiter)
 
 // helper function for SSL enforcement
 customers.use((req, res, next) => {

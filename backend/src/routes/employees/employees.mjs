@@ -25,7 +25,7 @@ const limiter = rateLimit({
     message: "Too many requests from this IP, please try again after 15 minutes",
 })
 
-employees.use(limiter) // apply to all requests
+employees.use(limiter)
 
 // helper function for SSL enforcement
 employees.use((req, res, next) => {

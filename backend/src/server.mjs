@@ -10,6 +10,7 @@ import express from "express"
 import customers from "./routes/customers/customers.mjs"
 import employees from "./routes/employees/employees.mjs"
 import transactions from "./routes/customers/transactions.mjs"
+
 // create app
 const app = express()
 
