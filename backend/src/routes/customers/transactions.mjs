@@ -15,6 +15,10 @@ dotenv.config()
 const currencies = currenciesData["data"]
 const providers = providersData["data"]
 
+// regex patterns
+const senderRegEx = /^[\w\.-]+@[a-zA-Z\d\.-]+\.[a-zA-Z]{2,6}$/
+const receiverRegEx = /^[A-Z]{4}[A-Z]{2}[A-Z0-9]{2}([A-Z0-9]{3})?$/
+
 // create router
 const transactions = express.Router()
 
@@ -58,7 +62,10 @@ transactions.get(route, async (req, res) => {
         return
     }
 
+    // get database collection
     const collection = await db.collection("transactions")
+
+    // get all documents from database
     const results = await collection.find({}).toArray()
 
     res.send(results).status(200)
@@ -116,15 +123,15 @@ transactions.post(route, async (req, res) => {
         return
     }
 
-    // check if user is a valid email address
-    if (!/^[\w\.-]+@[a-zA-Z\d\.-]+\.[a-zA-Z]{2,6}$/.test(sender)) {
+    // check if sender is a valid email address
+    if (!sender.match(senderRegEx)) {
         res.send("Invalid sender").status(400)
 
         return
     }
 
     // check if receiver is a valid BIC
-    if (!/^[A-Z]{4}[A-Z]{2}[A-Z0-9]{2}([A-Z0-9]{3})?$/.test(receiver)) {
+    if (!receiver.match(receiverRegEx)) {
         res.send("Invalid receiver").status(400)
 
         return
@@ -161,11 +168,22 @@ transactions.post(route, async (req, res) => {
         provider: provider,
     }
 
-    // insert document into database
+    // get database collection
     const collection = await db.collection("transactions")
+
+    // insert document into database
     const result = await collection.insertOne(document)
 
-    res.send(result).status(200)
+    // check if document was inserted
+    if (result.insertedCount === 1) {
+        res.send("Transaction successful").status(201)
+
+        return
+    } else {
+        res.send("Transaction failed").status(500)
+
+        return
+    }
 })
 
 export default transactions

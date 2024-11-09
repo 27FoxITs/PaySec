@@ -3,31 +3,35 @@ import dotenv from "dotenv"
 import express from "express"
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
-import { body, validationResult } from "express-validator" // For input validation
 import rateLimit from "express-rate-limit" // Rate limiting to prevent brute force attacks
 
 // local imports -------------------------------------------------------------------------------- //
 import db from "../../db.mjs"
 
+// set up environment variables
 dotenv.config()
 
-const users = express.Router()
-const route = "/api/customers"
+// regex patterns
+const emailRegEx = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+const passwordRegEx = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/
+const nameRegEx = /^[A-Za-z' ]+$/
 
-// Rate Limiting to prevent brute-force attacks
+// create router
+const users = express.Router()
+
+// declare route
+const route = "/api/customers/users"
+
+// enforce rate-limiting to prevent brute force attacks
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // Limit each IP to 100 requests per windowMs
+    max: 100, // limit each IP to 100 requests per windowMs
     message: "Too many requests from this IP, please try again after 15 minutes",
 })
 
-users.use(limiter) // Apply to all requests
+users.use(limiter) // apply to all requests
 
-// Input validation regex patterns
-const emailRegEx = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-const passwordRegEx = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/
-
-// Helper function for SSL enforcement (if necessary for your express app)
+// helper function for SSL enforcement
 users.use((req, res, next) => {
     if (req.secure || process.env.NODE_ENV !== "production") {
         next()
@@ -36,100 +40,186 @@ users.use((req, res, next) => {
     }
 })
 
-// POST route for registration with input validation and password hashing
-users.post(
-    `${route}/register`,
-    // Validate input
-    [
-        body("email").matches(emailRegEx).withMessage("Invalid email format"),
-        body("password")
-            .matches(passwordRegEx)
-            .withMessage(
-                "Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, and one digit"
-            ),
-        body("name").notEmpty().withMessage("Name is required"),
-    ],
-    async (req, res) => {
-        // Handle validation errors
-        const errors = validationResult(req)
-        if (!errors.isEmpty()) {
-            return res.status(400).json({ errors: errors.array() })
-        }
+// POST /login route
+users.post(`${route}/login`, async (req, res) => {
+    // check if any data at all was provided
+    if (!req.body) {
+        res.send("No data provided").status(400)
 
-        const { email, password, name } = req.body
-
-        try {
-            // Check if the user already exists
-            const collection = await db.collection("users")
-            const userExists = await collection.findOne({ email })
-
-            if (userExists) {
-                return res.status(400).json({ error: "User already exists" })
-            }
-
-            // Hash the password with salting
-            const hashedPassword = await bcrypt.hash(password, 12) // Stronger bcrypt with salt rounds
-
-            // Create new user
-            const newUser = {
-                email,
-                password: hashedPassword,
-                name,
-                createdAt: new Date(),
-            }
-
-            await collection.insertOne(newUser)
-
-            res.status(201).json({ message: "User registered successfully" })
-        } catch (error) {
-            res.status(500).json({ error: "Internal Server Error" })
-        }
+        return
     }
-)
 
-// POST route for login with password hashing and JWT
-users.post(
-    `${route}/login`,
-    // Validate input
-    [
-        body("email").matches(emailRegEx).withMessage("Invalid email format"),
-        body("password").notEmpty().withMessage("Password is required"),
-    ],
-    async (req, res) => {
-        // Handle validation errors
-        const errors = validationResult(req)
-        if (!errors.isEmpty()) {
-            return res.status(400).json({ errors: errors.array() })
-        }
+    // check if the correct amount of keys were provided
+    if (Object.keys(req.body).length < 2) {
+        res.send("Not enough data. Expected 2 keys, got " + Object.keys(req.body).length).status(
+            400
+        )
 
-        const { email, password } = req.body
+        return
+    } else if (Object.keys(req.body).length > 2) {
+        res.send("Too much data. Expected 2 keys, got " + Object.keys(req.body).length).status(400)
 
-        try {
-            // Check if the user exists
-            const collection = await db.collection("users")
-            const user = await collection.findOne({ email })
-
-            if (!user) {
-                return res.status(400).json({ error: "User not found" })
-            }
-
-            // Compare the password with bcrypt
-            const passwordMatch = await bcrypt.compare(password, user.password)
-
-            if (!passwordMatch) {
-                return res.status(400).json({ error: "Invalid password" })
-            }
-
-            // Generate JWT token with expiry and payload
-            const token = jwt.sign({ id: user._id, email: user.email }, process.env.JWT_SECRET, {
-                expiresIn: "1h",
-            })
-
-            res.status(200).json({ message: "Login successful", token })
-        } catch (error) {
-            res.status(500).json({ error: "Internal Server Error" })
-        }
+        return
     }
-)
+
+    // extract data from body
+    const email = req.body.email
+    const password = req.body.password
+
+    // check if all required keys were provided
+    if (!email) {
+        res.send("No email provided").status(400)
+
+        return
+    } else if (!password) {
+        res.send("No password provided").status(400)
+
+        return
+    }
+
+    // check if email is a valid email address
+    if (!email.match(emailRegEx)) {
+        res.send("Invalid email format").status(400)
+
+        return
+    }
+
+    // check if password is a valid password
+    if (!password.match(passwordRegEx)) {
+        res.send(
+            "Password must be at least 8 characters long, contain at least one uppercase " +
+                "letter, one lowercase letter, and one digit"
+        ).status(400)
+
+        return
+    }
+
+    // get database collection
+    const collection = await db.collection("users")
+
+    // get user document
+    const user = await collection.findOne({ email })
+
+    // check if user exists
+    if (!user) {
+        res.send("User not found").status(400)
+
+        return
+    }
+
+    // compare password
+    if (!(await bcrypt.compare(password, user.password))) {
+        res.send("Invalid password").status(401)
+
+        return
+    }
+
+    // generate token
+    const token = jwt.sign({ email: email }, process.env.JWT_SECRET, { expiresIn: "1h" })
+
+    res.send({ message: "Login successful", token }).status(200)
+})
+
+// POST /register route
+users.post(`${route}/register`, async (req, res) => {
+    // check if any data at all was provided
+    if (!req.body) {
+        res.send("No data provided").status(400)
+
+        return
+    }
+
+    // check if the correct amount of keys were provided
+    if (Object.keys(req.body).length < 3) {
+        res.send("Not enough data. Expected 3 keys, got " + Object.keys(req.body).length).status(
+            400
+        )
+
+        return
+    } else if (Object.keys(req.body).length > 3) {
+        res.send("Too much data. Expected 3 keys, got " + Object.keys(req.body).length).status(400)
+
+        return
+    }
+
+    // extract data from body
+    const email = req.body.email
+    const password = req.body.password
+    const name = req.body.name
+
+    // check if all required keys were provided
+    if (!email) {
+        res.send("No email provided").status(400)
+
+        return
+    } else if (!password) {
+        res.send("No password provided").status(400)
+
+        return
+    } else if (!name) {
+        res.send("No name provided").status(400)
+
+        return
+    }
+
+    // check if email is a valid email address
+    if (!email.match(emailRegEx)) {
+        res.send("Invalid email format").status(400)
+
+        return
+    }
+
+    // check if password is a valid password
+    if (!password.match(passwordRegEx)) {
+        res.send(
+            "Password must be at least 8 characters long, contain at least one uppercase " +
+                "letter, one lowercase letter, and one digit"
+        ).status(400)
+
+        return
+    }
+
+    // check if name is a valid name
+    if (!name.match(nameRegEx)) {
+        res.send("Invalid name").status(400)
+
+        return
+    }
+
+    // get database collection
+    const collection = await db.collection("users")
+
+    // check if email already exists
+    if ((await collection.find({ email: email }).count()) > 0) {
+        res.send("User already exists").status(400)
+
+        return
+    }
+
+    // hash password
+    const passwordHashed = await bcrypt.hash(password, 12)
+
+    // create document to enforce schema
+    const document = {
+        email: email,
+        password: passwordHashed,
+        name: name,
+        created: new Date(Date.now()).toISOString(),
+    }
+
+    // insert document
+    const result = await collection.insertOne(document)
+
+    // check if document was inserted
+    if (result.insertedCount === 1) {
+        res.send("Registration successful").status(201)
+
+        return
+    } else {
+        res.send("Registration failed").status(500)
+
+        return
+    }
+})
 
 export default users
