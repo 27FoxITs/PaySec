@@ -28,18 +28,23 @@ const route = "/api/customers/transactions"
 transactions.get(route, async (req, res) => {
     // check if any data at all was provided
     if (!req.body) {
-        res.send("No data provided").status(400)
+        res.send({ message: "No data provided" }).status(400)
 
         return
     }
 
     // check if the correct amount of keys were provided
     if (Object.keys(req.body).length == 0) {
-        res.send("Not enough data. Expected 1 key, got " + Object.keys(req.body).length).status(400)
+        res.send({
+            message:
+                "Not enough data. Expected at least 1 key, got " + Object.keys(req.body).length,
+        }).status(400)
 
         return
     } else if (Object.keys(req.body).length > 1) {
-        res.send("Too much data. Expected 1 keys, got " + Object.keys(req.body).length).status(400)
+        res.send({
+            message: "Too much data. Expected at most 2 keys, got " + Object.keys(req.body).length,
+        }).status(400)
 
         return
     }
@@ -49,14 +54,14 @@ transactions.get(route, async (req, res) => {
 
     // check if required key was provided
     if (!key) {
-        res.send("No key provided").status(400)
+        res.send({ message: "No key provided" }).status(400)
 
         return
     }
 
     // check if key is a valid key
     if (key !== process.env.KEY) {
-        res.send("Unauthorized").status(401)
+        res.send({ message: "Unauthorized" }).status(401)
 
         return
     }
@@ -74,20 +79,22 @@ transactions.get(route, async (req, res) => {
 transactions.post(route, async (req, res) => {
     // check if any data at all was provided
     if (!req.body) {
-        res.send("No data provided").status(400)
+        res.send({ message: "No data provided" }).status(400)
 
         return
     }
 
     // check if the correct amount of keys were provided
     if (Object.keys(req.body).length < 5) {
-        res.send("Not enough data. Expected 5 keys, got " + Object.keys(req.body).length).status(
-            400
-        )
+        res.send({
+            message: "Not enough data. Expected 5 keys, got " + Object.keys(req.body).length,
+        }).status(400)
 
         return
     } else if (Object.keys(req.body).length > 5) {
-        res.send("Too much data. Expected 5 keys, got " + Object.keys(req.body).length).status(400)
+        res.send({
+            message: "Too much data. Expected 5 keys, got " + Object.keys(req.body).length,
+        }).status(400)
 
         return
     }
@@ -101,58 +108,58 @@ transactions.post(route, async (req, res) => {
 
     // check if all required keys were provided
     if (!sender) {
-        res.send("No sender provided").status(400)
+        res.send({ message: "No sender provided" }).status(400)
 
         return
     } else if (!receiver) {
-        res.send("No receiver provided").status(400)
+        res.send({ message: "No receiver provided" }).status(400)
 
         return
     } else if (!amount) {
-        res.send("No amount provided").status(400)
+        res.send({ message: "No amount provided" }).status(400)
 
         return
     } else if (!currency) {
-        res.send("No currency provided").status(400)
+        res.send({ message: "No currency provided" }).status(400)
 
         return
     } else if (!provider) {
-        res.send("No provider provided").status(400)
+        res.send({ message: "No provider provided" }).status(400)
 
         return
     }
 
     // check if sender is a valid email address
     if (!sender.match(senderRegEx)) {
-        res.send("Invalid sender").status(400)
+        res.send({ message: "Invalid sender" }).status(400)
 
         return
     }
 
     // check if receiver is a valid BIC
     if (!receiver.match(receiverRegEx)) {
-        res.send("Invalid receiver").status(400)
+        res.send({ message: "Invalid receiver" }).status(400)
 
         return
     }
 
     // check if amount is a valid number above 0
     if (isNaN(amount) || amount < 0) {
-        res.send("Invalid amount").status(400)
+        res.send({ message: "Invalid amount" }).status(400)
 
         return
     }
 
     // check if currency is a valid currency
     if (!currencies[currency]) {
-        res.send("Invalid currency").status(400)
+        res.send({ message: "Invalid currency" }).status(400)
 
         return
     }
 
     // check if provider is a valid provider
     if (!providers.includes(provider)) {
-        res.send("Invalid provider").status(400)
+        res.send({ message: "Invalid provider" }).status(400)
 
         return
     }
@@ -175,11 +182,11 @@ transactions.post(route, async (req, res) => {
 
     // check if document was inserted
     if (result.insertedId !== null) {
-        res.send("Transaction successful").status(201)
+        res.send({ message: "Transaction successful" }).status(201)
 
         return
     } else {
-        res.send("Transaction failed").status(500)
+        res.send({ message: "Transaction failed" }).status(500)
 
         return
     }
