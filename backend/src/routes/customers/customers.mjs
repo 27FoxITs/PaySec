@@ -6,7 +6,10 @@ import jwt from "jsonwebtoken"
 import rateLimit from "express-rate-limit"
 
 // local imports -------------------------------------------------------------------------------- //
-import { employees } from "../../db.mjs"
+import { customersDB } from "../../db.mjs"
+
+// set up environment variables
+dotenv.config()
 
 // regex patterns
 const emailRegEx = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -14,10 +17,10 @@ const passwordRegEx = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/
 const nameRegEx = /^[A-Za-z' ]+$/
 
 // create router
-const users = express.Router()
+const customers = express.Router()
 
 // declare route
-const route = "/api/employees/users"
+const route = "/api/customers"
 
 // enforce rate-limiting to prevent brute force attacks
 const limiter = rateLimit({
@@ -26,10 +29,10 @@ const limiter = rateLimit({
     message: "Too many requests from this IP, please try again after 15 minutes",
 })
 
-users.use(limiter) // apply to all requests
+customers.use(limiter) // apply to all requests
 
 // helper function for SSL enforcement
-users.use((req, res, next) => {
+customers.use((req, res, next) => {
     if (req.secure || process.env.NODE_ENV !== "production") {
         next()
     } else {
@@ -38,7 +41,7 @@ users.use((req, res, next) => {
 })
 
 // POST /login route
-users.post(`${route}/login`, async (req, res) => {
+customers.post(`${route}/login`, async (req, res) => {
     // check if any data at all was provided
     if (!req.body) {
         res.send("No data provided").status(400)
@@ -76,27 +79,30 @@ users.post(`${route}/login`, async (req, res) => {
 
     // check if email is a valid email address
     if (!email.match(emailRegEx)) {
-        res.send("Invalid email").status(400)
+        res.send("Invalid email format").status(400)
 
         return
     }
 
     // check if password is a valid password
     if (!password.match(passwordRegEx)) {
-        res.send("Invalid password").status(400)
+        res.send(
+            "Password must be at least 8 characters long, contain at least one uppercase " +
+                "letter, one lowercase letter, and one digit"
+        ).status(400)
 
         return
     }
 
     // get database collection
-    const collection = employees.collection("users")
+    const collection = await customersDB.collection("users")
 
     // get user document
     const user = await collection.findOne({ email })
 
     // check if user exists
     if (!user) {
-        res.send("User not found").status(404)
+        res.send("User not found").status(400)
 
         return
     }
@@ -109,15 +115,13 @@ users.post(`${route}/login`, async (req, res) => {
     }
 
     // generate token
-    const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET, {
-        expiresIn: "1h",
-    })
+    const token = jwt.sign({ email: email }, process.env.JWT_SECRET, { expiresIn: "1h" })
 
     res.send({ message: "Login successful", token }).status(200)
 })
 
 // POST /register route
-users.post(`${route}/register`, async (req, res) => {
+customers.post(`${route}/register`, async (req, res) => {
     // check if any data at all was provided
     if (!req.body) {
         res.send("No data provided").status(400)
@@ -160,14 +164,17 @@ users.post(`${route}/register`, async (req, res) => {
 
     // check if email is a valid email address
     if (!email.match(emailRegEx)) {
-        res.send("Invalid email").status(400)
+        res.send("Invalid email format").status(400)
 
         return
     }
 
     // check if password is a valid password
     if (!password.match(passwordRegEx)) {
-        res.send("Invalid password").status(400)
+        res.send(
+            "Password must be at least 8 characters long, contain at least one uppercase " +
+                "letter, one lowercase letter, and one digit"
+        ).status(400)
 
         return
     }
@@ -180,11 +187,11 @@ users.post(`${route}/register`, async (req, res) => {
     }
 
     // get database collection
-    const collection = employees.collection("users")
+    const collection = await customersDB.collection("users")
 
     // check if email already exists
     if ((await collection.find({ email: email }).count()) > 0) {
-        res.send("Email already in use").status(409)
+        res.send("User already exists").status(400)
 
         return
     }
@@ -205,14 +212,14 @@ users.post(`${route}/register`, async (req, res) => {
 
     // check if document was inserted
     if (result.insertedId !== null) {
-        res.send("User created").status(201)
+        res.send("Registration successful").status(201)
 
         return
     } else {
-        res.send("Unable to create user").status(500)
+        res.send("Registration failed").status(500)
 
         return
     }
 })
 
-export default users
+export default customers

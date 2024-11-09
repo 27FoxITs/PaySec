@@ -8,8 +8,8 @@ import cors from "cors"
 import express from "express"
 
 // local imports -------------------------------------------------------------------------------- //
-import customers from "./routes/customers/users.mjs"
-import employees from "./routes/employees/users.mjs"
+import customers from "./routes/customers/customers.mjs"
+import employees from "./routes/employees/employees.mjs"
 import transactions from "./routes/customers/transactions.mjs"
 // create app
 const app = express()
