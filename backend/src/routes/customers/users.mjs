@@ -3,7 +3,7 @@ import dotenv from "dotenv"
 import express from "express"
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
-import rateLimit from "express-rate-limit" // Rate limiting to prevent brute force attacks
+import rateLimit from "express-rate-limit"
 
 // local imports -------------------------------------------------------------------------------- //
 import { customers } from "../../db.mjs"
@@ -211,7 +211,7 @@ users.post(`${route}/register`, async (req, res) => {
     const result = await collection.insertOne(document)
 
     // check if document was inserted
-    if (result.insertedCount === 1) {
+    if (result.insertedId !== null) {
         res.send("Registration successful").status(201)
 
         return

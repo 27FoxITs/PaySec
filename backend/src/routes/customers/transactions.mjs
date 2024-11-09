@@ -175,7 +175,7 @@ transactions.post(route, async (req, res) => {
     const result = await collection.insertOne(document)
 
     // check if document was inserted
-    if (result.insertedCount === 1) {
+    if (result.insertedId !== null) {
         res.send("Transaction successful").status(201)
 
         return
