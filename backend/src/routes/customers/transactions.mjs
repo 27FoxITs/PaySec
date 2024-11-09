@@ -1,7 +1,6 @@
 // third-party imports -------------------------------------------------------------------------- //
 import dotenv from "dotenv"
 import express from "express"
-import { ObjectId } from "mongodb"
 
 // local imports -------------------------------------------------------------------------------- //
 import currenciesData from "../../data/currencies.json" with { type: "json" }
@@ -16,7 +15,7 @@ const currencies = currenciesData["data"]
 const providers = providersData["data"]
 
 // regex patterns
-const senderRegEx = /^[\w\.-]+@[a-zA-Z\d\.-]+\.[a-zA-Z]{2,6}$/
+const senderRegEx = /^[\w.-]+@[a-zA-Z\d.-]+\.[a-zA-Z]{2,6}$/
 const receiverRegEx = /^[A-Z]{4}[A-Z]{2}[A-Z0-9]{2}([A-Z0-9]{3})?$/
 
 // create router
