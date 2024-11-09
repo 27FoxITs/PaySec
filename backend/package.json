@@ -3,8 +3,9 @@
     "version": "1.0.0",
     "main": "src/server.jms",
     "scripts": {
-        "start": "node src/server.mjs",
-        "dev": "nodemon src/server.mjs"
+        "dev": "nodemon src/server.mjs",
+        "format": "prettier --write ./src",
+        "start": "node src/server.mjs"
     },
     "dependencies": {
         "bcrypt": "^5.1.1",
@@ -18,6 +19,9 @@
         "mongoose": "^8.7.1"
     },
     "devDependencies": {
+        "@eslint/js": "^9.14.0",
+        "eslint": "^9.14.0",
+        "globals": "^15.12.0",
         "nodemon": "^3.1.7",
         "prettier": "^3.3.3"
     }

@@ -1,6 +1,5 @@
 // system imports ------------------------------------------------------------------------------- //
 import fs from "fs"
-import http from "http"
 import https from "https"
 
 // third-party imports -------------------------------------------------------------------------- //
