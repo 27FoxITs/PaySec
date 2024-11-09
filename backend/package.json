@@ -3,8 +3,9 @@
     "version": "1.0.0",
     "main": "src/server.jms",
     "scripts": {
-        "start": "node src/server.mjs",
-        "dev": "nodemon src/server.mjs"
+        "dev": "nodemon src/server.mjs",
+        "format": "prettier --write ./src",
+        "start": "node src/server.mjs"
     },
     "dependencies": {
         "bcrypt": "^5.1.1",
