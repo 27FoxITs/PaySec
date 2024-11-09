@@ -4,7 +4,7 @@ import express from "express"
 import { ObjectId } from "mongodb"
 
 // local imports -------------------------------------------------------------------------------- //
-import db from "../../db.mjs"
+import { customers } from "../../db.mjs"
 import currenciesData from "../../data/currencies.json" with { type: "json" }
 import providersData from "../../data/providers.json" with { type: "json" }
 
@@ -63,7 +63,7 @@ transactions.get(route, async (req, res) => {
     }
 
     // get database collection
-    const collection = await db.collection("transactions")
+    const collection = await customers.collection("transactions")
 
     // get all documents from database
     const results = await collection.find({}).toArray()
@@ -169,7 +169,7 @@ transactions.post(route, async (req, res) => {
     }
 
     // get database collection
-    const collection = await db.collection("transactions")
+    const collection = await customers.collection("transactions")
 
     // insert document into database
     const result = await collection.insertOne(document)

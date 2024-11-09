@@ -6,7 +6,7 @@ import jwt from "jsonwebtoken"
 import rateLimit from "express-rate-limit" // Rate limiting to prevent brute force attacks
 
 // local imports -------------------------------------------------------------------------------- //
-import db from "../../db.mjs"
+import { customers } from "../../db.mjs"
 
 // set up environment variables
 dotenv.config()
@@ -95,7 +95,7 @@ users.post(`${route}/login`, async (req, res) => {
     }
 
     // get database collection
-    const collection = await db.collection("users")
+    const collection = await customers.collection("users")
 
     // get user document
     const user = await collection.findOne({ email })
@@ -107,7 +107,7 @@ users.post(`${route}/login`, async (req, res) => {
         return
     }
 
-    // compare password
+    // check if password is correct
     if (!(await bcrypt.compare(password, user.password))) {
         res.send("Invalid password").status(401)
 
@@ -187,7 +187,7 @@ users.post(`${route}/register`, async (req, res) => {
     }
 
     // get database collection
-    const collection = await db.collection("users")
+    const collection = await customers.collection("users")
 
     // check if email already exists
     if ((await collection.find({ email: email }).count()) > 0) {
@@ -197,12 +197,12 @@ users.post(`${route}/register`, async (req, res) => {
     }
 
     // hash password
-    const passwordHashed = await bcrypt.hash(password, 12)
+    const hash = await bcrypt.hash(password, 12)
 
     // create document to enforce schema
     const document = {
         email: email,
-        password: passwordHashed,
+        password: hash,
         name: name,
         created: new Date(Date.now()).toISOString(),
     }
