@@ -17,6 +17,7 @@ const providers = providersData["data"]
 // regex patterns
 const senderRegEx = /^[\w.-]+@[a-zA-Z\d.-]+\.[a-zA-Z]{2,6}$/
 const receiverRegEx = /^[A-Z]{4}[A-Z]{2}[A-Z0-9]{2}([A-Z0-9]{3})?$/
+const filterTimestampRegex = /^(>|<)?\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z(:\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z)?$/
 
 // create router
 const transactions = express.Router()
@@ -28,44 +29,137 @@ const route = "/api/customers/transactions"
 transactions.get(route, async (req, res) => {
     // check if any data at all was provided
     if (!req.body) {
-        res.send("No data provided").status(400)
+        res.send({ message: "No data provided" }).status(400)
 
         return
     }
 
     // check if the correct amount of keys were provided
     if (Object.keys(req.body).length == 0) {
-        res.send("Not enough data. Expected 1 key, got " + Object.keys(req.body).length).status(400)
+        res.send({
+            message:
+                "Not enough data. Expected at least 1 key, got " + Object.keys(req.body).length,
+        }).status(400)
 
         return
-    } else if (Object.keys(req.body).length > 1) {
-        res.send("Too much data. Expected 1 keys, got " + Object.keys(req.body).length).status(400)
+    } else if (Object.keys(req.body).length > 2) {
+        res.send({
+            message: "Too much data. Expected at most 2 keys, got " + Object.keys(req.body).length,
+        }).status(400)
 
         return
     }
 
     // extract data from body
     const key = req.body.key
+    const filter = req.body.filter
+    let timestamp
+    let sender
+    let receiver
 
     // check if required key was provided
     if (!key) {
-        res.send("No key provided").status(400)
+        res.send({ message: "No key provided" }).status(400)
 
         return
     }
 
     // check if key is a valid key
     if (key !== process.env.KEY) {
-        res.send("Unauthorized").status(401)
+        res.send({ message: "Unauthorized" }).status(401)
 
         return
+    }
+
+    // check if filter is provided
+    if (filter) {
+        if (Object.keys(filter).length == 0) {
+            res.send({
+                message:
+                    "Not enough data. Filter expected at least 1 key, got " +
+                    Object.keys(filter).length,
+            }).status(400)
+
+            return
+        } else if (Object.keys(filter).length > 3) {
+            res.send({
+                message:
+                    "Too much data. Filter expected at most 3 keys, got " +
+                    Object.keys(filter).length,
+            }).status(400)
+
+            return
+        }
+
+        // extract data from filter
+        timestamp = filter.timestamp
+        sender = filter.sender
+        receiver = filter.receiver
+
+        // check if timestamp is a valid timestamp
+        if (timestamp) {
+            if (!timestamp.match(filterTimestampRegex)) {
+                res.send({ message: "Invalid timestamp" }).status(400)
+
+                return
+            }
+        }
+
+        // check if sender is a valid email address
+        if (sender) {
+            if (!sender.match(senderRegEx)) {
+                res.send({ message: "Invalid sender" }).status(400)
+
+                return
+            }
+        }
+
+        // check if receiver is a valid BIC
+        if (receiver) {
+            if (!receiver.match(receiverRegEx)) {
+                res.send({ message: "Invalid receiver" }).status(400)
+
+                return
+            }
+        }
     }
 
     // get database collection
     const collection = await customersDB.collection("transactions")
 
     // get all documents from database
-    const results = await collection.find({}).toArray()
+    let results = await collection.find({}).toArray()
+
+    // filter documents based on timestamp
+    if (timestamp) {
+        if (timestamp.startsWith(">")) {
+            timestamp = timestamp.slice(1)
+
+            results = results.filter((result) => new Date(result.timestamp) > new Date(timestamp))
+        } else if (timestamp.startsWith("<")) {
+            timestamp = timestamp.slice(1)
+
+            results = results.filter((result) => new Date(result.timestamp) < new Date(timestamp))
+        } else if (timestamp.includes(":")) {
+            const timestamps = timestamp.split(":")
+
+            results = results.filter(
+                (result) =>
+                    new Date(result.timestamp) > new Date(timestamps[0]) &&
+                    new Date(result.timestamp) < new Date(timestamps[1])
+            )
+        }
+    }
+
+    // filter documents based on sender
+    if (sender) {
+        results = results.filter((result) => result.sender === sender)
+    }
+
+    // filter documents based on receiver
+    if (receiver) {
+        results = results.filter((result) => result.receiver === receiver)
+    }
 
     res.send(results).status(200)
 })
@@ -74,20 +168,22 @@ transactions.get(route, async (req, res) => {
 transactions.post(route, async (req, res) => {
     // check if any data at all was provided
     if (!req.body) {
-        res.send("No data provided").status(400)
+        res.send({ message: "No data provided" }).status(400)
 
         return
     }
 
     // check if the correct amount of keys were provided
     if (Object.keys(req.body).length < 5) {
-        res.send("Not enough data. Expected 5 keys, got " + Object.keys(req.body).length).status(
-            400
-        )
+        res.send({
+            message: "Not enough data. Expected 5 keys, got " + Object.keys(req.body).length,
+        }).status(400)
 
         return
     } else if (Object.keys(req.body).length > 5) {
-        res.send("Too much data. Expected 5 keys, got " + Object.keys(req.body).length).status(400)
+        res.send({
+            message: "Too much data. Expected 5 keys, got " + Object.keys(req.body).length,
+        }).status(400)
 
         return
     }
@@ -101,58 +197,58 @@ transactions.post(route, async (req, res) => {
 
     // check if all required keys were provided
     if (!sender) {
-        res.send("No sender provided").status(400)
+        res.send({ message: "No sender provided" }).status(400)
 
         return
     } else if (!receiver) {
-        res.send("No receiver provided").status(400)
+        res.send({ message: "No receiver provided" }).status(400)
 
         return
     } else if (!amount) {
-        res.send("No amount provided").status(400)
+        res.send({ message: "No amount provided" }).status(400)
 
         return
     } else if (!currency) {
-        res.send("No currency provided").status(400)
+        res.send({ message: "No currency provided" }).status(400)
 
         return
     } else if (!provider) {
-        res.send("No provider provided").status(400)
+        res.send({ message: "No provider provided" }).status(400)
 
         return
     }
 
     // check if sender is a valid email address
     if (!sender.match(senderRegEx)) {
-        res.send("Invalid sender").status(400)
+        res.send({ message: "Invalid sender" }).status(400)
 
         return
     }
 
     // check if receiver is a valid BIC
     if (!receiver.match(receiverRegEx)) {
-        res.send("Invalid receiver").status(400)
+        res.send({ message: "Invalid receiver" }).status(400)
 
         return
     }
 
     // check if amount is a valid number above 0
     if (isNaN(amount) || amount < 0) {
-        res.send("Invalid amount").status(400)
+        res.send({ message: "Invalid amount" }).status(400)
 
         return
     }
 
     // check if currency is a valid currency
     if (!currencies[currency]) {
-        res.send("Invalid currency").status(400)
+        res.send({ message: "Invalid currency" }).status(400)
 
         return
     }
 
     // check if provider is a valid provider
     if (!providers.includes(provider)) {
-        res.send("Invalid provider").status(400)
+        res.send({ message: "Invalid provider" }).status(400)
 
         return
     }
@@ -175,11 +271,11 @@ transactions.post(route, async (req, res) => {
 
     // check if document was inserted
     if (result.insertedId !== null) {
-        res.send("Transaction successful").status(201)
+        res.send({ message: "Transaction successful" }).status(201)
 
         return
     } else {
-        res.send("Transaction failed").status(500)
+        res.send({ message: "Transaction failed" }).status(500)
 
         return
     }

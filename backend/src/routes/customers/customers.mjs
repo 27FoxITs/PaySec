@@ -29,7 +29,7 @@ const limiter = rateLimit({
     message: "Too many requests from this IP, please try again after 15 minutes",
 })
 
-customers.use(limiter) // apply to all requests
+customers.use(limiter)
 
 // helper function for SSL enforcement
 customers.use((req, res, next) => {
@@ -44,20 +44,22 @@ customers.use((req, res, next) => {
 customers.post(`${route}/login`, async (req, res) => {
     // check if any data at all was provided
     if (!req.body) {
-        res.send("No data provided").status(400)
+        res.send({ message: "No data provided" }).status(400)
 
         return
     }
 
     // check if the correct amount of keys were provided
     if (Object.keys(req.body).length < 2) {
-        res.send("Not enough data. Expected 2 keys, got " + Object.keys(req.body).length).status(
-            400
-        )
+        res.send({
+            message: "Not enough data. Expected 2 keys, got " + Object.keys(req.body).length,
+        }).status(400)
 
         return
     } else if (Object.keys(req.body).length > 2) {
-        res.send("Too much data. Expected 2 keys, got " + Object.keys(req.body).length).status(400)
+        res.send({
+            message: "Too much data. Expected 2 keys, got " + Object.keys(req.body).length,
+        }).status(400)
 
         return
     }
@@ -68,28 +70,29 @@ customers.post(`${route}/login`, async (req, res) => {
 
     // check if all required keys were provided
     if (!email) {
-        res.send("No email provided").status(400)
+        res.send({ message: "No email provided" }).status(400)
 
         return
     } else if (!password) {
-        res.send("No password provided").status(400)
+        res.send({ message: "No password provided" }).status(400)
 
         return
     }
 
     // check if email is a valid email address
     if (!email.match(emailRegEx)) {
-        res.send("Invalid email format").status(400)
+        res.send({ message: "Invalid email format" }).status(400)
 
         return
     }
 
     // check if password is a valid password
     if (!password.match(passwordRegEx)) {
-        res.send(
-            "Password must be at least 8 characters long, contain at least one uppercase " +
-                "letter, one lowercase letter, and one digit"
-        ).status(400)
+        res.send({
+            message:
+                "Password must be at least 8 characters long, contain at least one uppercase " +
+                "letter, one lowercase letter, and one digit",
+        }).status(400)
 
         return
     }
@@ -102,14 +105,14 @@ customers.post(`${route}/login`, async (req, res) => {
 
     // check if user exists
     if (!user) {
-        res.send("User not found").status(400)
+        res.send({ message: "User not found" }).status(400)
 
         return
     }
 
     // check if password is correct
     if (!(await bcrypt.compare(password, user.password))) {
-        res.send("Invalid password").status(401)
+        res.send({ message: "Invalid password" }).status(401)
 
         return
     }
@@ -124,20 +127,22 @@ customers.post(`${route}/login`, async (req, res) => {
 customers.post(`${route}/register`, async (req, res) => {
     // check if any data at all was provided
     if (!req.body) {
-        res.send("No data provided").status(400)
+        res.send({ message: "No data provided" }).status(400)
 
         return
     }
 
     // check if the correct amount of keys were provided
     if (Object.keys(req.body).length < 3) {
-        res.send("Not enough data. Expected 3 keys, got " + Object.keys(req.body).length).status(
-            400
-        )
+        res.send({
+            message: "Not enough data. Expected 3 keys, got " + Object.keys(req.body).length,
+        }).status(400)
 
         return
     } else if (Object.keys(req.body).length > 3) {
-        res.send("Too much data. Expected 3 keys, got " + Object.keys(req.body).length).status(400)
+        res.send({
+            message: "Too much data. Expected 3 keys, got " + Object.keys(req.body).length,
+        }).status(400)
 
         return
     }
@@ -149,39 +154,40 @@ customers.post(`${route}/register`, async (req, res) => {
 
     // check if all required keys were provided
     if (!email) {
-        res.send("No email provided").status(400)
+        res.send({ message: "No email provided" }).status(400)
 
         return
     } else if (!password) {
-        res.send("No password provided").status(400)
+        res.send({ message: "No password provided" }).status(400)
 
         return
     } else if (!name) {
-        res.send("No name provided").status(400)
+        res.send({ message: "No name provided" }).status(400)
 
         return
     }
 
     // check if email is a valid email address
     if (!email.match(emailRegEx)) {
-        res.send("Invalid email format").status(400)
+        res.send({ message: "Invalid email format" }).status(400)
 
         return
     }
 
     // check if password is a valid password
     if (!password.match(passwordRegEx)) {
-        res.send(
-            "Password must be at least 8 characters long, contain at least one uppercase " +
-                "letter, one lowercase letter, and one digit"
-        ).status(400)
+        res.send({
+            message:
+                "Password must be at least 8 characters long, contain at least one uppercase " +
+                "letter, one lowercase letter, and one digit",
+        }).status(400)
 
         return
     }
 
     // check if name is a valid name
     if (!name.match(nameRegEx)) {
-        res.send("Invalid name").status(400)
+        res.send({ message: "Invalid name" }).status(400)
 
         return
     }
@@ -191,7 +197,7 @@ customers.post(`${route}/register`, async (req, res) => {
 
     // check if email already exists
     if ((await collection.find({ email: email }).count()) > 0) {
-        res.send("User already exists").status(400)
+        res.send({ message: "User already exists" }).status(400)
 
         return
     }
@@ -212,11 +218,11 @@ customers.post(`${route}/register`, async (req, res) => {
 
     // check if document was inserted
     if (result.insertedId !== null) {
-        res.send("Registration successful").status(201)
+        res.send({ message: "Registration successful" }).status(201)
 
         return
     } else {
-        res.send("Registration failed").status(500)
+        res.send({ message: "Registration failed" }).status(500)
 
         return
     }

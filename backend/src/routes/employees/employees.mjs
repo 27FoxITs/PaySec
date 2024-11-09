@@ -25,7 +25,7 @@ const limiter = rateLimit({
     message: "Too many requests from this IP, please try again after 15 minutes",
 })
 
-employees.use(limiter) // apply to all requests
+employees.use(limiter)
 
 // helper function for SSL enforcement
 employees.use((req, res, next) => {
@@ -40,20 +40,22 @@ employees.use((req, res, next) => {
 employees.post(`${route}/login`, async (req, res) => {
     // check if any data at all was provided
     if (!req.body) {
-        res.send("No data provided").status(400)
+        res.send({ message: "No data provided" }).status(400)
 
         return
     }
 
     // check if the correct amount of keys were provided
     if (Object.keys(req.body).length < 2) {
-        res.send("Not enough data. Expected 2 keys, got " + Object.keys(req.body).length).status(
-            400
-        )
+        res.send({
+            message: "Not enough data. Expected 2 keys, got " + Object.keys(req.body).length,
+        }).status(400)
 
         return
     } else if (Object.keys(req.body).length > 2) {
-        res.send("Too much data. Expected 2 keys, got " + Object.keys(req.body).length).status(400)
+        res.send({
+            message: "Too much data. Expected 2 keys, got " + Object.keys(req.body).length,
+        }).status(400)
 
         return
     }
@@ -64,25 +66,25 @@ employees.post(`${route}/login`, async (req, res) => {
 
     // check if all required keys were provided
     if (!email) {
-        res.send("No email provided").status(400)
+        res.send({ message: "No email provided" }).status(400)
 
         return
     } else if (!password) {
-        res.send("No password provided").status(400)
+        res.send({ message: "No password provided" }).status(400)
 
         return
     }
 
     // check if email is a valid email address
     if (!email.match(emailRegEx)) {
-        res.send("Invalid email").status(400)
+        res.send({ message: "Invalid email" }).status(400)
 
         return
     }
 
     // check if password is a valid password
     if (!password.match(passwordRegEx)) {
-        res.send("Invalid password").status(400)
+        res.send({ message: "Invalid password" }).status(400)
 
         return
     }
@@ -95,14 +97,14 @@ employees.post(`${route}/login`, async (req, res) => {
 
     // check if user exists
     if (!user) {
-        res.send("User not found").status(404)
+        res.send({ message: "User not found" }).status(404)
 
         return
     }
 
     // check if password is correct
     if (!(await bcrypt.compare(password, user.password))) {
-        res.send("Invalid password").status(401)
+        res.send({ message: "Invalid password" }).status(401)
 
         return
     }
@@ -119,20 +121,22 @@ employees.post(`${route}/login`, async (req, res) => {
 employees.post(`${route}/register`, async (req, res) => {
     // check if any data at all was provided
     if (!req.body) {
-        res.send("No data provided").status(400)
+        res.send({ message: "No data provided" }).status(400)
 
         return
     }
 
     // check if the correct amount of keys were provided
     if (Object.keys(req.body).length < 3) {
-        res.send("Not enough data. Expected 3 keys, got " + Object.keys(req.body).length).status(
-            400
-        )
+        res.send({
+            message: "Not enough data. Expected 3 keys, got " + Object.keys(req.body).length,
+        }).status(400)
 
         return
     } else if (Object.keys(req.body).length > 3) {
-        res.send("Too much data. Expected 3 keys, got " + Object.keys(req.body).length).status(400)
+        res.send({
+            message: "Too much data. Expected 3 keys, got " + Object.keys(req.body).length,
+        }).status(400)
 
         return
     }
@@ -144,36 +148,36 @@ employees.post(`${route}/register`, async (req, res) => {
 
     // check if all required keys were provided
     if (!email) {
-        res.send("No email provided").status(400)
+        res.send({ message: "No email provided" }).status(400)
 
         return
     } else if (!password) {
-        res.send("No password provided").status(400)
+        res.send({ message: "No password provided" }).status(400)
 
         return
     } else if (!name) {
-        res.send("No name provided").status(400)
+        res.send({ message: "No name provided" }).status(400)
 
         return
     }
 
     // check if email is a valid email address
     if (!email.match(emailRegEx)) {
-        res.send("Invalid email").status(400)
+        res.send({ message: "Invalid email" }).status(400)
 
         return
     }
 
     // check if password is a valid password
     if (!password.match(passwordRegEx)) {
-        res.send("Invalid password").status(400)
+        res.send({ message: "Invalid password" }).status(400)
 
         return
     }
 
     // check if name is a valid name
     if (!name.match(nameRegEx)) {
-        res.send("Invalid name").status(400)
+        res.send({ message: "Invalid name" }).status(400)
 
         return
     }
@@ -183,7 +187,7 @@ employees.post(`${route}/register`, async (req, res) => {
 
     // check if email already exists
     if ((await collection.find({ email: email }).count()) > 0) {
-        res.send("Email already in use").status(409)
+        res.send({ message: "Email already in use" }).status(409)
 
         return
     }
@@ -204,11 +208,11 @@ employees.post(`${route}/register`, async (req, res) => {
 
     // check if document was inserted
     if (result.insertedId !== null) {
-        res.send("User created").status(201)
+        res.send({ message: "User created" }).status(201)
 
         return
     } else {
-        res.send("Unable to create user").status(500)
+        res.send({ message: "Unable to create user" }).status(500)
 
         return
     }
