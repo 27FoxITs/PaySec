@@ -17,6 +17,7 @@ const providers = providersData["data"]
 // regex patterns
 const senderRegEx = /^[\w.-]+@[a-zA-Z\d.-]+\.[a-zA-Z]{2,6}$/
 const receiverRegEx = /^[A-Z]{4}[A-Z]{2}[A-Z0-9]{2}([A-Z0-9]{3})?$/
+const filterTimestampRegex = /^(>|<)?\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z(:\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z)?$/
 
 // create router
 const transactions = express.Router()
@@ -41,7 +42,7 @@ transactions.get(route, async (req, res) => {
         }).status(400)
 
         return
-    } else if (Object.keys(req.body).length > 1) {
+    } else if (Object.keys(req.body).length > 2) {
         res.send({
             message: "Too much data. Expected at most 2 keys, got " + Object.keys(req.body).length,
         }).status(400)
@@ -51,6 +52,10 @@ transactions.get(route, async (req, res) => {
 
     // extract data from body
     const key = req.body.key
+    const filter = req.body.filter
+    let timestamp
+    let sender
+    let receiver
 
     // check if required key was provided
     if (!key) {
@@ -66,11 +71,95 @@ transactions.get(route, async (req, res) => {
         return
     }
 
+    // check if filter is provided
+    if (filter) {
+        if (Object.keys(filter).length == 0) {
+            res.send({
+                message:
+                    "Not enough data. Filter expected at least 1 key, got " +
+                    Object.keys(filter).length,
+            }).status(400)
+
+            return
+        } else if (Object.keys(filter).length > 3) {
+            res.send({
+                message:
+                    "Too much data. Filter expected at most 3 keys, got " +
+                    Object.keys(filter).length,
+            }).status(400)
+
+            return
+        }
+
+        // extract data from filter
+        timestamp = filter.timestamp
+        sender = filter.sender
+        receiver = filter.receiver
+
+        // check if timestamp is a valid timestamp
+        if (timestamp) {
+            if (!timestamp.match(filterTimestampRegex)) {
+                res.send({ message: "Invalid timestamp" }).status(400)
+
+                return
+            }
+        }
+
+        // check if sender is a valid email address
+        if (sender) {
+            if (!sender.match(senderRegEx)) {
+                res.send({ message: "Invalid sender" }).status(400)
+
+                return
+            }
+        }
+
+        // check if receiver is a valid BIC
+        if (receiver) {
+            if (!receiver.match(receiverRegEx)) {
+                res.send({ message: "Invalid receiver" }).status(400)
+
+                return
+            }
+        }
+    }
+
     // get database collection
     const collection = await customersDB.collection("transactions")
 
     // get all documents from database
-    const results = await collection.find({}).toArray()
+    let results = await collection.find({}).toArray()
+
+    // filter documents based on timestamp
+    if (timestamp) {
+        if (timestamp.startsWith(">")) {
+            timestamp = timestamp.slice(1)
+
+            results = results.filter((result) => new Date(result.timestamp) > new Date(timestamp))
+        } else if (timestamp.startsWith("<")) {
+            timestamp = timestamp.slice(1)
+
+            results = results.filter((result) => new Date(result.timestamp) < new Date(timestamp))
+        } else if (timestamp.includes(":")) {
+            const timestamps = timestamp.split(":")
+
+            results = results.filter(
+                (result) =>
+                    new Date(result.timestamp) > new Date(timestamps[0]) &&
+                    new Date(result.timestamp) < new Date(timestamps[1])
+            )
+        }
+    }
+
+    // filter documents based on sender
+    if (sender) {
+        results = results.filter((result) => result.sender === sender)
+    }
+
+    // filter documents based on receiver
+    if (receiver) {
+        results = results.filter((result) => result.receiver === receiver)
+    }
 
     res.send(results).status(200)
 })
