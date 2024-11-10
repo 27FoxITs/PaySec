@@ -66,7 +66,7 @@ transactions.get(route, async (req, res) => {
         return
     }
 
-    // check if key is a valid key
+    // check if key is valid
     if (key !== process.env.KEY) {
         res.send({ message: "Unauthorized" }).status(401)
 
@@ -99,7 +99,7 @@ transactions.get(route, async (req, res) => {
         receiver = filter.receiver
         verified = filter.verified
 
-        // check if timestamp is a valid timestamp
+        // check if keys are valid
         if (timestamp) {
             if (!timestamp.match(filterTimestampRegex)) {
                 res.send({ message: "Invalid timestamp" }).status(400)
@@ -107,8 +107,6 @@ transactions.get(route, async (req, res) => {
                 return
             }
         }
-
-        // check if sender is a valid email address
         if (sender) {
             if (!sender.match(senderRegEx)) {
                 res.send({ message: "Invalid sender" }).status(400)
@@ -116,8 +114,6 @@ transactions.get(route, async (req, res) => {
                 return
             }
         }
-
-        // check if receiver is a valid BIC
         if (receiver) {
             if (!receiver.match(receiverRegEx)) {
                 res.send({ message: "Invalid receiver" }).status(400)
@@ -125,8 +121,6 @@ transactions.get(route, async (req, res) => {
                 return
             }
         }
-
-        // check if verified is a valid boolean
         if (verified) {
             if (typeof verified !== "boolean") {
                 res.send({ message: "Invalid verified" }).status(400)
