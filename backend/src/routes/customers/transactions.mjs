@@ -95,6 +95,7 @@ transactions.get(route, async (req, res) => {
         timestamp = filter.timestamp
         sender = filter.sender
         receiver = filter.receiver
+        verified = filter.verified
 
         // check if timestamp is a valid timestamp
         if (timestamp) {
