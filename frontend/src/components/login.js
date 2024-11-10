@@ -1,52 +1,55 @@
 // src/components/Login.js
 import React, { useState } from "react";
-// import axios from "axios";
+import axios from "axios";
 import "./login.css";
 
 const Login = () => {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
   // RegEx for input validation
-  const usernameRegex = /^[a-zA-Z0-9._-]{3,20}$/;
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
 
   const handleLogin = async (e) => {
     e.preventDefault();
 
     // Validate inputs
-    if (!usernameRegex.test(username)) {
-      setError("Invalid username format.");
+    if (!emailRegex.test(email)) {
+      setError("Invalid email format.");
       return;
     }
     if (!passwordRegex.test(password)) {
       setError("Password must be at least 8 characters, including one uppercase letter, one lowercase letter, and one digit.");
       return;
     }
-
+  
     try {
-      // Make API request to login endpoint
-      // const response = await axios.post("https://localhost:3000/api/customers/login", {
-      //   email: username,
-      //   password: password,
-      // });
-
-      // Handle successful login
-      // if (response.status === 200) {
-      //   localStorage.setItem("token", response.data.token);
+     // Make API request to login endpoint
+     const response = await axios.post("http://localhost:3000/api/customers/login", {
+      email: email,
+      password: password,
+    });
+    // Handle successful login
+    if (response.status === 200) {
+      if (response.data.message === "Login_successful") {
+        localStorage.setItem("token", response.data.token); // Save the token in local storage
         setError("");
-        window.location.href = "/dashboard";
-      // }
+        window.location.href = "/dashboard"; // Redirect to the dashboard
+      } else {
+        setError("Invalid email or password");
+      }
+    }
     } catch (err) {
       // Handle errors
       if (err.response && err.response.status === 400) {
-        setError("Invalid username or password.");
+        setError("Invalid email or password.");
       } else {
         setError("Server error. Please try again later.");
       }
     }
-  };
+  };  
 
   return (
    
@@ -57,10 +60,10 @@ const Login = () => {
           <input
           className="input"
             type="text"
-            id="username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            placeholder="Enter your username"
+            id="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Enter your email"
             required
           />
           <input
