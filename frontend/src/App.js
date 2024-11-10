@@ -3,6 +3,7 @@ import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./components/login";
 import Dashboard from "./components/emp_dashboard";
+import CustomerTransaction from "./components/customerTransaction";
 
 
 function App() {
@@ -13,6 +14,7 @@ function App() {
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<Login />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/transaction" element={<CustomerTransaction />} />
       </Routes>
     </BrowserRouter>
   );
