@@ -6,26 +6,37 @@ const StatsOverview = ({ stats }) => {
   return (
     <div className="stats-overview">
       <div className="stat-item">
-        <div className="st_item">
+        <div className="header_item">
           <h3>Total Customers</h3>
+          <p>Total active customers</p>
         </div>
-          <p>{stats.totalCustomers}</p>
+        <div className="st_item">
+          <h2>{stats.totalCustomers}</h2>
+        </div>
+          
         
         
       </div>
       <div className="stat-item">
         <div className="header_item">
           <h3>Total Transactions</h3>
+          <p>Total transaction by all users</p>
         </div>
-          <p>{stats.totalTransactions}</p>
-        
-        
+        <div className="st_item">
+          <h2>{stats.totalTransactions}</h2>
+        </div>
+
       </div>
       <div className="stat-item">
-        <div className="st_item">
+        <div className="header_item">
           <h3>Pending Transactions</h3>
-          <p>{stats.pendingTransactions}</p>
-        </div>
+          <p>Current Pending transactions</p>
+          </div>
+          <div className="st_item">
+            <h2>{stats.pendingTransactions}</h2>
+          </div>
+          
+        
         
       </div>
     </div>
