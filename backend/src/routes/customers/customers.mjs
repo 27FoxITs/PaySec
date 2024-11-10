@@ -12,9 +12,11 @@ import { customersDB } from "../../db.mjs"
 dotenv.config()
 
 // regex patterns
+const nameRegEx = /^[A-Za-z' ]+$/
+const idNumberRegEx = /^\d{13}$/
+const accountNumberRegex = /^[A-Z]{2}\d{2}[A-Z0-9]{1,30}$/
 const emailRegEx = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const passwordRegEx = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/
-const nameRegEx = /^[A-Za-z' ]+$/
 
 // create router
 const customers = express.Router()
@@ -133,27 +135,41 @@ customers.post(`${route}/register`, async (req, res) => {
     }
 
     // check if the correct amount of keys were provided
-    if (Object.keys(req.body).length < 3) {
+    if (Object.keys(req.body).length < 5) {
         res.send({
-            message: "Not enough data. Expected 3 keys, got " + Object.keys(req.body).length,
+            message: "Not enough data. Expected 5 keys, got " + Object.keys(req.body).length,
         }).status(400)
 
         return
-    } else if (Object.keys(req.body).length > 3) {
+    } else if (Object.keys(req.body).length > 5) {
         res.send({
-            message: "Too much data. Expected 3 keys, got " + Object.keys(req.body).length,
+            message: "Too much data. Expected 5 keys, got " + Object.keys(req.body).length,
         }).status(400)
 
         return
     }
 
     // extract data from body
+    const name = req.body.name
+    const idNumber = req.body.idNumber
+    const accountNumber = req.body.accountNumber
     const email = req.body.email
     const password = req.body.password
-    const name = req.body.name
 
     // check if all required keys were provided
-    if (!email) {
+    if (!name) {
+        res.send({ message: "No name provided" }).status(400)
+
+        return
+    } else if (!idNumber) {
+        res.send({ message: "No idNumber provided" }).status(400)
+
+        return
+    } else if (!accountNumber) {
+        res.send({ message: "No accountNumber provided" }).status(400)
+
+        return
+    } else if (!email) {
         res.send({ message: "No email provided" }).status(400)
 
         return
@@ -161,33 +177,31 @@ customers.post(`${route}/register`, async (req, res) => {
         res.send({ message: "No password provided" }).status(400)
 
         return
-    } else if (!name) {
-        res.send({ message: "No name provided" }).status(400)
-
-        return
     }
 
-    // check if email is a valid email address
-    if (!email.match(emailRegEx)) {
+    // check if keys are valid
+    if (!name.match(nameRegEx)) {
+        res.send({ message: "Invalid name" }).status(400)
+
+        return
+    } else if (!idNumber.match(idNumberRegEx)) {
+        res.send({ message: "Invalid ID number" }).status(400)
+
+        return
+    } else if (!accountNumber.match(accountNumberRegex)) {
+        res.send({ message: "Invalid account number" }).status(400)
+
+        return
+    } else if (!email.match(emailRegEx)) {
         res.send({ message: "Invalid email format" }).status(400)
 
         return
-    }
-
-    // check if password is a valid password
-    if (!password.match(passwordRegEx)) {
+    } else if (!password.match(passwordRegEx)) {
         res.send({
             message:
                 "Password must be at least 8 characters long, contain at least one uppercase " +
                 "letter, one lowercase letter, and one digit",
         }).status(400)
-
-        return
-    }
-
-    // check if name is a valid name
-    if (!name.match(nameRegEx)) {
-        res.send({ message: "Invalid name" }).status(400)
 
         return
     }
@@ -207,9 +221,11 @@ customers.post(`${route}/register`, async (req, res) => {
 
     // create document to enforce schema
     const document = {
+        name: name,
+        idNumber: idNumber,
+        accountNumber: accountNumber,
         email: email,
         password: hash,
-        name: name,
         created: new Date(Date.now()).toISOString(),
     }
 

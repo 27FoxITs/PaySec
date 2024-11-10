@@ -8,9 +8,9 @@ import rateLimit from "express-rate-limit"
 import { employeesDB } from "../../db.mjs"
 
 // regex patterns
+const nameRegEx = /^[A-Za-z' ]+$/
 const emailRegEx = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const passwordRegEx = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/
-const nameRegEx = /^[A-Za-z' ]+$/
 
 // create router
 const employees = express.Router()
@@ -142,12 +142,16 @@ employees.post(`${route}/register`, async (req, res) => {
     }
 
     // extract data from body
+    const name = req.body.name
     const email = req.body.email
     const password = req.body.password
-    const name = req.body.name
 
     // check if all required keys were provided
-    if (!email) {
+    if (!name) {
+        res.send({ message: "No name provided" }).status(400)
+
+        return
+    } else if (!email) {
         res.send({ message: "No email provided" }).status(400)
 
         return
@@ -155,29 +159,19 @@ employees.post(`${route}/register`, async (req, res) => {
         res.send({ message: "No password provided" }).status(400)
 
         return
-    } else if (!name) {
-        res.send({ message: "No name provided" }).status(400)
-
-        return
     }
 
-    // check if email is a valid email address
-    if (!email.match(emailRegEx)) {
+    // check if keys are valid
+    if (!name.match(nameRegEx)) {
+        res.send({ message: "Invalid name" }).status(400)
+
+        return
+    } else if (!email.match(emailRegEx)) {
         res.send({ message: "Invalid email" }).status(400)
 
         return
-    }
-
-    // check if password is a valid password
-    if (!password.match(passwordRegEx)) {
+    } else if (!password.match(passwordRegEx)) {
         res.send({ message: "Invalid password" }).status(400)
-
-        return
-    }
-
-    // check if name is a valid name
-    if (!name.match(nameRegEx)) {
-        res.send({ message: "Invalid name" }).status(400)
 
         return
     }
@@ -197,9 +191,9 @@ employees.post(`${route}/register`, async (req, res) => {
 
     // create document to enforce schema
     const document = {
+        name: name,
         email: email,
         password: hash,
-        name: name,
         created: new Date(Date.now()).toISOString(),
     }
 
