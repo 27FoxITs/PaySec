@@ -1,0 +1,121 @@
+/* src/styles/Dashboard.css */
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu",
+        "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: #080808;
+    color: #ffffff;
+  }
+.dashboard-container {
+    display: grid;
+    grid-template-rows: repeat(1, 0.5fr 1fr) ;
+
+  }
+
+
+  .dashboard_header_container
+  {
+    display: grid;
+    grid-template-columns: repeat(1, 0.2fr 0.2fr 1fr 0.1fr ) ;
+    border-radius: 8px;
+    border-bottom: solid;
+    box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1);
+    height: 50%;
+    
+  }
+
+  .header_links
+  {
+    display: grid;
+    grid-template-columns: repeat(1, 0.5fr 0.5fr ) ;
+    align-items: center;
+  }
+
+  .transaction_nav
+  {
+    display: grid;
+    grid-template-columns: repeat(1, 0.24fr 0.4fr) ;
+    margin-top: 2%;
+   
+  }
+  
+  .stats-overview
+  {
+    display: grid;
+    grid-template-columns: repeat(1, 0.4fr 0.5fr 0.4fr ) ;
+    justify-items: center;
+    
+    
+    
+  }
+
+  .stat-item {
+    display: grid;
+    grid-template-rows: repeat(1, 0.3fr ) ;
+    text-align: center;
+    padding: 20px;
+    border-radius: 8px;
+    border: solid;
+    box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1);
+  }
+
+  
+
+
+  .logo_name
+  {
+    font-size: 160%;
+    margin-top: 20%;
+  }
+
+  .header_main h1
+  {
+    text-align: left;
+    padding-left: 25%;
+  }
+
+  .logo_header
+  {
+    width: 100%;
+  }
+  
+  h1 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+
+  
+  
+  
+  .transaction-table {
+    margin-top: 20px;
+  }
+  
+  .transaction-table table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .transaction-table th,
+  .transaction-table td {
+    padding: 10px;
+    border: 1px solid #ccc;
+    text-align: left;
+  }
+  
+  .logout-button {
+    
+    width: 10%;
+    background-color: #080808;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .logout-button:hover {
+    color: #20272e;
+  }
+  
