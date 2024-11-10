@@ -1,6 +1,6 @@
 // src/components/Login.js
 import React, { useState } from "react";
-import axios from "axios";
+// import axios from "axios";
 import "./login.css";
 
 const Login = () => {
@@ -27,17 +27,17 @@ const Login = () => {
 
     try {
       // Make API request to login endpoint
-      const response = await axios.post("https://localhost:3000/api/customers/login", {
-        email: username,
-        password: password,
-      });
+      // const response = await axios.post("https://localhost:3000/api/customers/login", {
+      //   email: username,
+      //   password: password,
+      // });
 
       // Handle successful login
-      if (response.status === 200) {
-        localStorage.setItem("token", response.data.token);
+      // if (response.status === 200) {
+      //   localStorage.setItem("token", response.data.token);
         setError("");
         window.location.href = "/dashboard";
-      }
+      // }
     } catch (err) {
       // Handle errors
       if (err.response && err.response.status === 400) {
@@ -49,12 +49,13 @@ const Login = () => {
   };
 
   return (
+   
     <div className="login-container">
-      <h2>Employee Login</h2>
-      <form onSubmit={handleLogin}>
-        <div className="input-group">
-          <label htmlFor="username">Username</label>
+      <form onSubmit={handleLogin} className="form">
+        <img className="login-logo" src="\Paysec-logo.png" alt="logo"></img>
+        <div className="title"><h2>Welcome to PaySec<br /><span>Login</span></h2></div>
           <input
+          className="input"
             type="text"
             id="username"
             value={username}
@@ -62,10 +63,8 @@ const Login = () => {
             placeholder="Enter your username"
             required
           />
-        </div>
-        <div className="input-group">
-          <label htmlFor="password">Password</label>
           <input
+          className="input"
             type="password"
             id="password"
             value={password}
@@ -73,9 +72,9 @@ const Login = () => {
             placeholder="Enter your password"
             required
           />
-        </div>
+        
         {error && <p className="error-message">{error}</p>}
-        <button type="submit">Login</button>
+        <button type="submit" className="button-confirm">Login</button>
       </form>
     </div>
   );
