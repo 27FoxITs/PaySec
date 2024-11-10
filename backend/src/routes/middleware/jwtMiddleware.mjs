@@ -23,3 +23,5 @@ export const verifyToken = (req, res, next) => {
         next(); // Pass control to the next middleware
     });
 };
+
+export default jwtMiddleware
