@@ -33,7 +33,8 @@ const Login = () => {
     });
     // Handle successful login
     if (response.status === 200) {
-      if (response.data.message === "Login_successful") {
+      console.log(response);
+      if (response.data.message === "Login successful") {
         localStorage.setItem("token", response.data.token); // Save the token in local storage
         setError("");
         window.location.href = "/dashboard"; // Redirect to the dashboard
