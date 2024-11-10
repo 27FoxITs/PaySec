@@ -17,7 +17,8 @@ const providers = providersData["data"]
 // regex patterns
 const senderRegEx = /^[\w.-]+@[a-zA-Z\d.-]+\.[a-zA-Z]{2,6}$/
 const receiverRegEx = /^[A-Z]{4}[A-Z]{2}[A-Z0-9]{2}([A-Z0-9]{3})?$/
-const filterTimestampRegex = /^(>|<)?\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z(:\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z)?$/
+const filterTimestampRegex =
+    /^(>|<)?\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z(:\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z)?$/
 
 // create router
 const transactions = express.Router()
