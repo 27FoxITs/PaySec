@@ -1,4 +1,5 @@
 // third-party imports -------------------------------------------------------------------------- //
+import { ObjectId } from "mongodb"
 import dotenv from "dotenv"
 import express from "express"
 
@@ -53,7 +54,7 @@ transactions.get(route, async (req, res) => {
 
     // check if filter is provided
     if (filter) {
-        if (Object.keys(filter).length == 0) {
+        if (Object.keys(filter).length < 1) {
             res.send({
                 message:
                     "Not enough data. Filter expected at least 1 key, got " +
@@ -153,6 +154,65 @@ transactions.get(route, async (req, res) => {
     res.send(results).status(200)
 })
 
+// PATCH route
+transactions.patch(route, async (req, res) => {
+    // check if any data at all was provided
+    if (!req.body) {
+        res.send({ message: "No data provided" }).status(400)
+
+        return
+    }
+
+    // check if the correct amount of keys were provided
+    if (Object.keys(req.body).length < 2) {
+        res.send({
+            message: "Not enough data. Expected 2 keys, got " + Object.keys(req.body).length,
+        }).status(400)
+
+        return
+    } else if (Object.keys(req.body).length > 2) {
+        res.send({
+            message: "Too much data. Expected 2 keys, got " + Object.keys(req.body).length,
+        }).status(400)
+
+        return
+    }
+
+    // extract data from body
+    const oid = req.body.oid
+    const verified = req.body.verified
+
+    // check if all required keys were provided
+    if (!oid) {
+        res.send({ message: "No oid provided" }).status(400)
+
+        return
+    } else if (verified === undefined) {
+        res.send({ message: "No verified provided" }).status(400)
+
+        return
+    }
+
+    // check if keys are valid
+    if (!ObjectId.isValid(oid)) {
+        res.send({ message: "Invalid oid" }).status(400)
+
+        return
+    } else if (typeof verified !== "boolean") {
+        res.send({ message: "Invalid verified" }).status(400)
+
+        return
+    }
+
+    // get database collection
+    const collection = await customersDB.collection("transactions")
+
+    // update document in database
+    await collection.updateOne({ _id: new ObjectId(oid) }, { $set: { verified: verified } })
+
+    res.send({ message: "Update successful" }).status(200)
+})
+
 // POST route
 transactions.post(route, async (req, res) => {
     // check if any data at all was provided
@@ -250,7 +310,6 @@ transactions.post(route, async (req, res) => {
         amount: amount,
         currency: currency,
         provider: provider,
-        verified: false,
     }
 
     // get database collection
