@@ -157,7 +157,7 @@ transactions.get(route, jwtMiddleware, async (req, res) => {
 })
 
 // PATCH route
-transactions.patch(route, async (req, res) => {
+transactions.patch(route, jwtMiddleware, async (req, res) => {
     // check if any data at all was provided
     if (!req.body) {
         res.send({ message: "No data provided" }).status(400)
