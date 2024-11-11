@@ -237,7 +237,7 @@ customers.post(`${route}/register`, async (req, res) => {
         // On succesful registration, generates jwt token
         const token = jwt.sign({ email: email }, process.env.JWT_SECRET, { expiresIn: "1h" })
 
-        res.send({ message: "Registration successful" }).status(201)
+        res.send({ message: "Registration successful", token }).status(201)
 
         return
     } else {
