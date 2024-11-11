@@ -1,6 +1,6 @@
 // third-party imports -------------------------------------------------------------------------- //
 import dotenv from "dotenv"
-import express from "express"
+import express, { query } from "express"
 
 // local imports -------------------------------------------------------------------------------- //
 import currenciesData from "../../data/currencies.json" with { type: "json" }
@@ -29,31 +29,32 @@ const route = "/api/customers/transactions"
 // GET route
 transactions.get(route, jwtMiddleware, async (req, res) => {
     // check if any data at all was provided
-    if (!req.body) {
+
+    if (!req.query) {
         res.send({ message: "No data provided" }).status(400)
 
         return
-    }
+    } 
 
     // check if the correct amount of keys were provided
-    if (Object.keys(req.body).length == 0) {
+    if (Object.keys(req.query).length == 0) {
         res.send({
             message:
-                "Not enough data. Expected at least 1 key, got " + Object.keys(req.body).length,
+                "Not enough data. Expected at least 1 key, got " + Object.keys(req.query).length,
         }).status(400)
 
         return
-    } else if (Object.keys(req.body).length > 2) {
+    } else if (Object.keys(req.query).length > 2) {
         res.send({
-            message: "Too much data. Expected at most 2 keys, got " + Object.keys(req.body).length,
+            message: "Too much data. Expected at most 2 keys, got " + Object.keys(req.query).length,
         }).status(400)
 
         return
     }
 
     // extract data from body
-    const key = req.body.key
-    const filter = req.body.filter
+    const key = req.query.key
+    const filter = req.query.filter
     let timestamp
     let sender
     let receiver
