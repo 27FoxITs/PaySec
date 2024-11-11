@@ -3,6 +3,9 @@ import React, { useState } from "react";
 import "./customerTransaction.css";
 import Card from "./card";
 
+import providersData from "../data/providers.json";
+import currenciesData from "../data/currencies.json";
+
 const CustomerTransaction = () => {
     const [amount, setAmount] = useState("");
     const [currency, setCurrency] = useState("USD");
@@ -13,10 +16,10 @@ const CustomerTransaction = () => {
     const [successMessage, setSuccessMessage] = useState("");
 
     // List of currencies
-    const currencies = ["USD", "EUR", "GBP", "ZAR", "JPY"];
-    const providers = ["SWIFT", "PayPal", "Bank Transfer"];
+    const currencies = Object.values(currenciesData.data).map(currency => currency.code);
+    const providers = providersData["data"];
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
         // Input validation
@@ -34,26 +37,47 @@ const CustomerTransaction = () => {
 
         // Simulate transaction submission
         const transactionData = {
-            amount,
-            currency,
-            provider,
-            accountInfo,
-            swiftCode,
+            sender: sessionStorage.getItem("cEmail"),
+            amount: amount,
+            currency: currency,
+            provider: provider,
+            accountInfo: accountInfo,
+            receiver: swiftCode,
         };
 
-        console.log("Transaction Data:", transactionData);
-        setSuccessMessage("Transaction submitted successfully!");
+        try {
+            // Make the POST request
+            const response = await fetch("http://localhost:3000/api/customers/transactions", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: localStorage.getItem("token"), // Add token if needed
+                },
+                body: JSON.stringify(transactionData),
+            });
 
-        // Reset form
-        setAmount("");
-        setCurrency("USD");
-        setProvider("SWIFT");
-        setAccountInfo("");
-        setSwiftCode("");
+            const data = await response.json();
+
+            if (data.message === "Transaction successful") {
+                console.log(response);
+                // Reset form
+                setAmount("");
+                setCurrency("USD");
+                setProvider("SWIFT");
+                setAccountInfo("");
+                setSwiftCode("");
+                setSuccessMessage("Transaction successful!");
+            } else {
+                setError(data.message || "Transaction failed");
+            }
+        } catch (error) {
+            setError("An error occurred while processing the transaction");
+        }
     };
 
     const handleLogout = () => {
         localStorage.removeItem("token");
+        sessionStorage.removeItem("cEmail");
         window.location.href = "/login";
     };
 

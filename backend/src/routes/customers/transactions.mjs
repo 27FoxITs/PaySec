@@ -225,13 +225,13 @@ transactions.post(route, jwtMiddleware, async (req, res) => {
     }
 
     // check if the correct amount of keys were provided
-    if (Object.keys(req.body).length < 5) {
+    if (Object.keys(req.body).length < 6) {
         res.send({
             message: "Not enough data. Expected 5 keys, got " + Object.keys(req.body).length,
         }).status(400)
 
         return
-    } else if (Object.keys(req.body).length > 5) {
+    } else if (Object.keys(req.body).length > 6) {
         res.send({
             message: "Too much data. Expected 5 keys, got " + Object.keys(req.body).length,
         }).status(400)
@@ -245,6 +245,7 @@ transactions.post(route, jwtMiddleware, async (req, res) => {
     const amount = req.body.amount
     const currency = req.body.currency
     const provider = req.body.provider
+    const accountInfo = req.body.accountInfo
 
     // check if all required keys were provided
     if (!sender) {
@@ -267,6 +268,8 @@ transactions.post(route, jwtMiddleware, async (req, res) => {
         res.send({ message: "No provider provided" }).status(400)
 
         return
+    } else if (!accountInfo) {
+        res.send({ message: "No accountInfo provided" }).status(400)
     }
 
     // check if sender is a valid email address
@@ -312,6 +315,7 @@ transactions.post(route, jwtMiddleware, async (req, res) => {
         amount: amount,
         currency: currency,
         provider: provider,
+        accountInfo: accountInfo,
     }
 
     // get database collection

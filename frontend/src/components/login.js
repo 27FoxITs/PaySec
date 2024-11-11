@@ -46,6 +46,7 @@ const Login = () => {
           if (response.status === 200) {
             console.log(response);
             if (response.data.message === "Login successful") {
+              sessionStorage.setItem("cEmail", email);
               localStorage.setItem("token", response.data.token); // Save the token in local storage
               setError("");
               window.location.href = "/transaction"; // Redirect to the dashboard

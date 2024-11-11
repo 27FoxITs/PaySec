@@ -1,3 +1,20 @@
 {
-    "data": ["EFT", "Payfast", "PayPal", "Stripe", "Yoco", "Zapper"]
+    "data": [
+        "SWIFT",
+        "CHIPS",
+        "SEPA",
+        "Faster Payments",
+        "ACH",
+        "Visa Direct",
+        "Mastercard Send",
+        "RippleNet",
+        "Interac",
+        "Global Payments",
+        "Alipay",
+        "WeChat Pay",
+        "Eftpos",
+        "UnionPay",
+        "SWIFT GPI",
+        "Paytm"
+    ]
 }
