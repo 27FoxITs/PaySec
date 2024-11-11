@@ -9,7 +9,7 @@ const Card = () => {
           <div className="flex__1">
             <p className="card__side__name-bank">PaySec bank</p>
             <div className="card__side__chip" />
-            <p className="card__side__name-person">Joshua Gay Xu</p>
+            <p className="card__side__name-person">Joshua Xu</p>
           </div>
         </div>
         <div className="card__side card__side_back">
@@ -18,7 +18,7 @@ const Card = () => {
           <div className="flex__2">
             <p className="card__side__other-numbers card__side__other-numbers_1">XX/XX</p>
             <p className="card__side__other-numbers card__side__other-numbers_2">XXX</p>
-            <div className="card__side__photo"><img src="/China.png"></img></div>
+            <div className="card__side__photo"><img src="/China.png" alt="Josh"></img></div>
             <div className="card__side__debit">debit</div>
           </div>
           <p className="card__side__other-info">

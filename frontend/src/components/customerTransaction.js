@@ -80,7 +80,7 @@ const CustomerTransaction = () => {
 
             <h1>Payment</h1>
 
-            <div class="main_payment">
+            <div className="main_payment">
                 <div className="card">
                 <h2>Make a Payment</h2>
                     <Card></Card>

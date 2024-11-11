@@ -10,29 +10,28 @@ body {
 .login-container {
   display: grid;
   grid-template-columns: 1fr;
-    width: 40%;
-    max-width: 400px;
+  width: 60%;
+  max-width: 2000px;
+  min-width: 1000px;
     padding-top: 10%;
     margin: 0 auto;
     justify-items: center;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    
   }
 
   .form {
     --input-focus: #2d8cf0;
     --font-color: #fefefe;
-    --font-color-sub: #7e7e7e;
-    --bg-color: #111;
+    --font-color-sub: #fefefe;
+    --bg-color: #080808;
     --main-color: #fefefe;
     padding-left: 5%;
     padding-right: 5%;
     background: var(--bg-color);
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: center;
-    gap: 10px;
+    display: grid;
+    grid-template-rows: repeat(1, 1fr 0.6fr 0.5fr 0.4fr );
+
+ 
     border-radius: 5px;
     border: 2px solid var(--main-color);
     box-shadow: 4px 4px var(--main-color);
@@ -47,6 +46,14 @@ body {
     
   }
 
+  .title p
+  {
+    justify-self: center;
+    align-self: center;
+    margin-bottom: 7%;
+    padding-left: 19%;
+  }
+
   .title span {
     color: var(--font-color-sub);
     font-weight: 600;
@@ -55,30 +62,11 @@ body {
     align-self: center;
   }
 
-  .input {
-    width: 250px;
-    height: 40px;
-    border-radius: 5px;
-    border: 2px solid var(--main-color);
-    background-color: var(--bg-color);
-    box-shadow: 4px 4px var(--main-color);
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--font-color);
-    padding: 5px 40px;
-    outline: none;
-    margin-left: 10% ;
-    margin-bottom: 2%;
-  }
 
-  .input::placeholder {
-    color: var(--font-color-sub);
-    opacity: 0.8;
-  }
 
-  .input:focus {
-    border: 2px solid var(--input-focus);
-  }
+
+
+  
 
 
 
@@ -90,7 +78,7 @@ body {
   .button-confirm {
     margin-top: 5%;
     margin-left: 37% ;
-    margin-bottom: 10%;
+    
     width: 120px;
     height: 40px;
     border-radius: 5px;
@@ -106,7 +94,6 @@ body {
     color: var(--font-color);
     font-weight: 900;
     font-size: 100%;
-    margin-bottom: 2%;
     padding-left: 5%;
     overflow-wrap: normal;
 
@@ -115,7 +102,7 @@ body {
 
   .login-logo
   {
-    padding-top: 10%;
+    padding-top: 5%;
     
   }
 /*   
