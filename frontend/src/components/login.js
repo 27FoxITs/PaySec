@@ -70,25 +70,40 @@ const Login = () => {
     <div className="login-container">
       <form onSubmit={handleLogin} className="form">
         <img className="login-logo" src="\Paysec-logo.png" alt="logo"></img>
-        <div className="title"><h2>Welcome to PaySec<br /><span>Login</span></h2></div>
-          <input
+        <div className="title"><h2>Welcome to PaySec<br /><span>Login</span></h2><p><span>Don't have an account? <a href="\register">Register</a></span></p></div>
+          <div className="login_container">
+            <div className="container">
+            <input
           className="input"
             type="text"
             id="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="Enter your email"
+           
             required
           />
-          <input
+          <label>Enter your email</label>
+
+            </div>
+          
+          </div>
+          <div className="login_container">
+            <div className="container">
+            <input
           className="input"
             type="password"
             id="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="Enter your password"
             required
           />
+          <label>Enter your password</label>
+          </div>
+
+            </div>
+          
+          
+          
         
         {error && <p className="error-message">{error}</p>}
         <button type="submit" className="button-confirm">Login</button>
