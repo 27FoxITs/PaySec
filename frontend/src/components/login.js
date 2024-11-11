@@ -4,68 +4,84 @@ import axios from "axios";
 import "./login.css";
 
 const Login = () => {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
   // RegEx for input validation
-  const usernameRegex = /^[a-zA-Z0-9._-]{3,20}$/;
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
 
   const handleLogin = async (e) => {
     e.preventDefault();
 
     // Validate inputs
-    if (!usernameRegex.test(username)) {
-      setError("Invalid username format.");
+    if (!emailRegex.test(email)) {
+      setError("Invalid email format.");
       return;
     }
     if (!passwordRegex.test(password)) {
       setError("Password must be at least 8 characters, including one uppercase letter, one lowercase letter, and one digit.");
       return;
     }
-
+  
     try {
       // Make API request to login endpoint
-      const response = await axios.post("https://localhost:3000/api/customers/login", {
-        email: username,
+      const eResponse = await axios.post("http://localhost:3000/api/employees/login", {
+        email: email,
         password: password,
       });
 
-      // Handle successful login
-      if (response.status === 200) {
-        localStorage.setItem("token", response.data.token);
-        setError("");
-        window.location.href = "/dashboard";
+      if(eResponse.status === 200){
+        if (eResponse.data.message === "Login successful") {
+          localStorage.setItem("token", eResponse.data.token); // Save the token in local storage
+          setError("");
+          window.location.href = "/dashboard"; // Redirect to the dashboard
+        } else {
+          const response = await axios.post("http://localhost:3000/api/customers/login", {
+            email: email,
+            password: password,
+          });
+          // Handle successful login
+          if (response.status === 200) {
+            console.log(response);
+            if (response.data.message === "Login successful") {
+              localStorage.setItem("token", response.data.token); // Save the token in local storage
+              setError("");
+              window.location.href = "/transaction"; // Redirect to the dashboard
+            } else {
+              setError("Invalid email or password");
+            }
+          }
+        }
       }
     } catch (err) {
       // Handle errors
       if (err.response && err.response.status === 400) {
-        setError("Invalid username or password.");
+        setError("Invalid email or password.");
       } else {
         setError("Server error. Please try again later.");
       }
     }
-  };
+  };  
 
   return (
+   
     <div className="login-container">
-      <h2>Employee Login</h2>
-      <form onSubmit={handleLogin}>
-        <div className="input-group">
-          <label htmlFor="username">Username</label>
+      <form onSubmit={handleLogin} className="form">
+        <img className="login-logo" src="\Paysec-logo.png" alt="logo"></img>
+        <div className="title"><h2>Welcome to PaySec<br /><span>Login</span></h2></div>
           <input
+          className="input"
             type="text"
-            id="username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            placeholder="Enter your username"
+            id="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Enter your email"
             required
           />
-        </div>
-        <div className="input-group">
-          <label htmlFor="password">Password</label>
           <input
+          className="input"
             type="password"
             id="password"
             value={password}
@@ -73,9 +89,9 @@ const Login = () => {
             placeholder="Enter your password"
             required
           />
-        </div>
+        
         {error && <p className="error-message">{error}</p>}
-        <button type="submit">Login</button>
+        <button type="submit" className="button-confirm">Login</button>
       </form>
     </div>
   );

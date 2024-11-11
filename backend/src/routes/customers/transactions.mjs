@@ -6,6 +6,7 @@ import express from "express"
 // local imports -------------------------------------------------------------------------------- //
 import currenciesData from "../../data/currencies.json" with { type: "json" }
 import providersData from "../../data/providers.json" with { type: "json" }
+import jwtMiddleware from "../middleware/jwtMiddleware.mjs";
 import { customersDB } from "../../db.mjs"
 
 // set up environment variables
@@ -28,9 +29,10 @@ const transactions = express.Router()
 const route = "/api/customers/transactions"
 
 // GET route
-transactions.get(route, async (req, res) => {
+transactions.get(route, jwtMiddleware, async (req, res) => {
     // check if any data at all was provided
-    if (!req.body) {
+
+    if (!req.query) {
         res.send({ message: "No data provided" }).status(400)
 
         return
@@ -214,7 +216,7 @@ transactions.patch(route, async (req, res) => {
 })
 
 // POST route
-transactions.post(route, async (req, res) => {
+transactions.post(route, jwtMiddleware, async (req, res) => {
     // check if any data at all was provided
     if (!req.body) {
         res.send({ message: "No data provided" }).status(400)
