@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import "./customerTransaction.css";
 import Card from "./card";
+import axios from "axios";
 
 import providersData from "../data/providers.json";
 import currenciesData from "../data/currencies.json";
@@ -46,19 +47,15 @@ const CustomerTransaction = () => {
         };
 
         try {
-            // Make the POST request
-            const response = await fetch("http://localhost:3000/api/customers/transactions", {
-                method: "POST",
+            // Make the POST request using axios
+            const response = await axios.post("http://localhost:3000/api/customers/transactions", transactionData, {
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: sessionStorage.getItem("token"), // Add token if needed
-                },
-                body: JSON.stringify(transactionData),
+                }
             });
-
-            const data = await response.json();
-
-            if (data.message === "Transaction successful") {
+        
+            if (response.data.message === "Transaction successful") {
                 // Reset form
                 setAmount("");
                 setCurrency("USD");
@@ -67,7 +64,7 @@ const CustomerTransaction = () => {
                 setSwiftCode("");
                 setSuccessMessage("Transaction successful!");
             } else {
-                setError(data.message || "Transaction failed");
+                setError(response.data.message || "Transaction failed");
             }
         } catch (error) {
             setError("An error occurred while processing the transaction");
