@@ -234,6 +234,9 @@ customers.post(`${route}/register`, async (req, res) => {
 
     // check if document was inserted
     if (result.insertedId !== null) {
+        // On succesful registration, generates jwt token
+        const token = jwt.sign({ email: email }, process.env.JWT_SECRET, { expiresIn: "1h" })
+
         res.send({ message: "Registration successful" }).status(201)
 
         return

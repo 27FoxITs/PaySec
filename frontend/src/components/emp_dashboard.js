@@ -6,7 +6,7 @@ import axios from "axios";
 import "./dashboard.css";
 
 const loadTransactions = async () => {
-  const eToken = localStorage.getItem("token");
+  const eToken = sessionStorage.getItem("token");
 
   try {
     // Use axios to make the GET request
@@ -61,7 +61,7 @@ const Dashboard = () => {
       pendingTransactions: pendingTransactions,
     };
 
-    console.log(mappedData);
+    //console.log(mappedData);
     setPendingTransactions(mappedData); // Update the state with the mapped data
     setStats(tStats);
   };
@@ -85,7 +85,7 @@ const Dashboard = () => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    sessionStorage.removeItem("token");
     window.location.href = "/login";
   };
 

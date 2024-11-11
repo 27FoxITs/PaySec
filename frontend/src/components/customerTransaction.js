@@ -51,7 +51,7 @@ const CustomerTransaction = () => {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    Authorization: localStorage.getItem("token"), // Add token if needed
+                    Authorization: sessionStorage.getItem("token"), // Add token if needed
                 },
                 body: JSON.stringify(transactionData),
             });
@@ -59,7 +59,6 @@ const CustomerTransaction = () => {
             const data = await response.json();
 
             if (data.message === "Transaction successful") {
-                console.log(response);
                 // Reset form
                 setAmount("");
                 setCurrency("USD");
@@ -76,7 +75,7 @@ const CustomerTransaction = () => {
     };
 
     const handleLogout = () => {
-        localStorage.removeItem("token");
+        sessionStorage.removeItem("token");
         sessionStorage.removeItem("cEmail");
         window.location.href = "/login";
     };

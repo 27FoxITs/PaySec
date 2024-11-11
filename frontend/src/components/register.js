@@ -2,9 +2,11 @@
 import React, { useState } from "react";
 import "./register.css";
 import Checkbox from "./checkbox";
+import axios from "axios";
 
 const CustomerRegister = () => {
   const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
   const [idNumber, setIdNumber] = useState("");
   const [accountNumber, setAccountNumber] = useState("");
   const [password, setPassword] = useState("");
@@ -34,28 +36,43 @@ const CustomerRegister = () => {
     return true;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm())  return;
 
     // Simulate registration submission
     const customerData = {
-      fullName,
-      idNumber,
-      accountNumber,
-      password,
+      name: fullName,
+      email: email,
+      idNumber: idNumber,
+      accountNumber: accountNumber,
+      password: password,
     };
 
-    console.log("Customer Registration Data:", customerData);
-    setSuccessMessage("Registration successful!");
-
-    // Reset form fields
-    setFullName("");
-    setIdNumber("");
-    setAccountNumber("");
-    setPassword("");
-
-    window.location.href = "/transaction";
+    try {
+      // Send data to the server
+      const response = await axios.post("http://localhost:3000/api/customers/register", customerData);
+      alert(response.data.message);
+      // Handle successful response
+      if (response.data.message === "Registration successful") {
+        setSuccessMessage("Registration successful");
+        sessionStorage.setItem("cEmail", email);
+        sessionStorage.setItem("token", response.data.token);
+        window.location.href = "/transaction";
+      } else {
+        setError(response.data.message); //Handle any other message when registration is not successful
+      }
+      // Redirect to another page after successful registration
+    } catch (err) {
+      // Handle errors
+      if (err.response) {
+        // Server error response
+        setError(err.response.data.message);
+      } else {
+        // Network or other errors
+        setError("An error occurred. Please try again.");
+      }
+    }
   };
 
   return (
@@ -86,6 +103,23 @@ const CustomerRegister = () => {
             required
           />
           <label htmlFor="fullName">Full Name:</label>
+
+            </div>
+          
+        </div>
+
+        <div className="register-group">
+            <div className="container">
+            
+          <input
+            type="text"
+            id="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            
+            required
+          />
+          <label htmlFor="email">email address:</label>
 
             </div>
           
