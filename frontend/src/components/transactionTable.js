@@ -1,5 +1,5 @@
 // src/components/TransactionTable.js
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./dashboard.css";
 import upArrow from "../assets/up_arrow.svg";
 import downArrow from "../assets/down_arrow.svg";
@@ -9,6 +9,10 @@ const PendingTransactionsTable = ({ transactions, onVerify, onReject }) => {
   const [filteredTransactions, setFilteredTransactions] = useState(transactions);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
   const [filterText, setFilterText] = useState("");
+
+  useEffect(() => {
+    setFilteredTransactions(transactions);
+  }, [transactions]);
 
   // Filter transactions based on input text
   const handleFilterChange = (e) => {
@@ -93,13 +97,13 @@ const PendingTransactionsTable = ({ transactions, onVerify, onReject }) => {
                 <td>{txn.email}</td>
                 <td>{txn.receiver}</td>
                 <td>{txn.provider}</td>
-                <td>${txn.amount.toFixed(2)}</td>
+                <td>${Number(txn.amount).toFixed(2)}</td>
                 <td>{txn.status}</td>
                 <td>
                   <button
                     className="verify-button"
                     onClick={() => onVerify(txn.id)}
-                    disabled={txn.status !== "Not Verified"}
+                    disabled={txn.status !== "Unverified"}
                   >
                     Verify
                   </button>
@@ -108,7 +112,7 @@ const PendingTransactionsTable = ({ transactions, onVerify, onReject }) => {
                   <button
                     className="reject-button"
                     onClick={() => onReject(txn.id)}
-                    disabled={txn.status !== "Not Verified"}
+                    disabled={txn.status !== "Unverified"}
                   >
                     Reject
                   </button>

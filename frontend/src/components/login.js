@@ -26,22 +26,35 @@ const Login = () => {
     }
   
     try {
-     // Make API request to login endpoint
-     const response = await axios.post("http://localhost:3000/api/customers/login", {
-      email: email,
-      password: password,
-    });
-    // Handle successful login
-    if (response.status === 200) {
-      console.log(response);
-      if (response.data.message === "Login successful") {
-        localStorage.setItem("token", response.data.token); // Save the token in local storage
-        setError("");
-        window.location.href = "/dashboard"; // Redirect to the dashboard
-      } else {
-        setError("Invalid email or password");
+      // Make API request to login endpoint
+      const eResponse = await axios.post("http://localhost:3000/api/employees/login", {
+        email: email,
+        password: password,
+      });
+
+      if(eResponse.status === 200){
+        if (eResponse.data.message === "Login successful") {
+          localStorage.setItem("token", eResponse.data.token); // Save the token in local storage
+          setError("");
+          window.location.href = "/dashboard"; // Redirect to the dashboard
+        } else {
+          const response = await axios.post("http://localhost:3000/api/customers/login", {
+            email: email,
+            password: password,
+          });
+          // Handle successful login
+          if (response.status === 200) {
+            console.log(response);
+            if (response.data.message === "Login successful") {
+              localStorage.setItem("token", response.data.token); // Save the token in local storage
+              setError("");
+              window.location.href = "/transaction"; // Redirect to the dashboard
+            } else {
+              setError("Invalid email or password");
+            }
+          }
+        }
       }
-    }
     } catch (err) {
       // Handle errors
       if (err.response && err.response.status === 400) {
