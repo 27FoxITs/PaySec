@@ -61,6 +61,11 @@ body {
     color: #fefefe;
   }
 
+  .title a:hover
+  {
+    color: #0056b3;
+  }
+
   .title span {
     color: var(--font-color-sub);
     font-weight: 600;
