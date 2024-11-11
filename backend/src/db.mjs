@@ -20,6 +20,8 @@ try {
 }
 
 // connect to database
-let db = conn.db("customers")
+let customersDB = conn.db("customers")
+let employeesDB = conn.db("employees")
 
-export default db
+// export databases
+export { customersDB, employeesDB }

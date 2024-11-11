@@ -1,15 +1,16 @@
 // system imports ------------------------------------------------------------------------------- //
 import fs from "fs"
-import http from "http"
-import https from "https"
+import https from "http"
 
 // third-party imports -------------------------------------------------------------------------- //
 import cors from "cors"
 import express from "express"
 
 // local imports -------------------------------------------------------------------------------- //
+import customers from "./routes/customers/customers.mjs"
+import employees from "./routes/employees/employees.mjs"
 import transactions from "./routes/customers/transactions.mjs"
-import users from "./routes/customers/users.mjs"
+
 // create app
 const app = express()
 
@@ -33,8 +34,10 @@ app.use((req, res, next) => {
 })
 
 // add routes
+app.use(customers)
+app.use(employees)
 app.use(transactions)
-app.use(users)
+
 // create https server
 let server = https.createServer(options, app)
 server.listen(process.env.PORT)
