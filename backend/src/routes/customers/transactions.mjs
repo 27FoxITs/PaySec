@@ -36,42 +36,20 @@ transactions.get(route, async (req, res) => {
     }
 
     // check if the correct amount of keys were provided
-    if (Object.keys(req.body).length == 0) {
+    if (Object.keys(req.body).length > 1) {
         res.send({
-            message:
-                "Not enough data. Expected at least 1 key, got " + Object.keys(req.body).length,
-        }).status(400)
-
-        return
-    } else if (Object.keys(req.body).length > 2) {
-        res.send({
-            message: "Too much data. Expected at most 2 keys, got " + Object.keys(req.body).length,
+            message: "Too much data. Expected at most 1 keys, got " + Object.keys(req.body).length,
         }).status(400)
 
         return
     }
 
     // extract data from body
-    const key = req.body.key
     const filter = req.body.filter
     let timestamp
     let sender
     let receiver
     let verified
-
-    // check if required key was provided
-    if (!key) {
-        res.send({ message: "No key provided" }).status(400)
-
-        return
-    }
-
-    // check if key is valid
-    if (key !== process.env.KEY) {
-        res.send({ message: "Unauthorized" }).status(401)
-
-        return
-    }
 
     // check if filter is provided
     if (filter) {
