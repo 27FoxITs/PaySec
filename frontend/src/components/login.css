@@ -104,12 +104,10 @@ body {
   }
   .error-message {
     color: var(--font-color);
-    font-weight: 900;
+    max-width: 400px;
     font-size: 100%;
-    padding-left: 5%;
-    overflow-wrap: normal;
-
     
+    overflow-wrap: normal;
   }
 
   .login-logo
