@@ -47,18 +47,18 @@ const Dashboard = () => {
       receiver: item.receiver,
       provider: item.provider,
       amount: item.amount,
-      status: item.verified ? "Verified" : "Unverified",
+      status: item.verified === true ? "Verified" : item.verified === false ? "Rejected" : "Unverified",
     }));
 
     // Counts the amount of unique customers by emails
     const uniqueCustomerCount = new Set(mappedData.map(item => item.email)).size;
     const totalTransactions = mappedData.length;
-    const pendingTransactions = mappedData.filter(txn => txn.status === "Unverified").length;
+    const pendingTransactionsCount = mappedData.filter(txn => txn.status === "Unverified").length;
 
     const tStats = {
       totalCustomers: uniqueCustomerCount,
       totalTransactions: totalTransactions,
-      pendingTransactions: pendingTransactions,
+      pendingTransactions: pendingTransactionsCount,
     };
 
     //console.log(mappedData);
@@ -70,18 +70,59 @@ const Dashboard = () => {
     fetchTransactions(); // Fetch transactions when the component mounts
   }, []);
 
-  const handleVerify = (id) => {
-    const updatedTransactions = pendingTransactions.map((txn) =>
-      txn._id === id ? { ...txn, status: "Verified" } : txn
-    );
-    setPendingTransactions(updatedTransactions);
+  const handleVerify = async (id) => {
+    try {
+
+      // Make PATCH request to API
+      const response = await axios.patch("http://localhost:3000/api/customers/transactions", {
+        oid: id, // Object ID of the transaction
+        verified: true, // Set verified to true for verification
+      }, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: sessionStorage.getItem("token"), // Include token if required
+        }
+      });
+
+      if (response.data.message === "Update successful") {
+        // Handle success if needed
+        fetchTransactions();
+        //console.log("Transaction verified successfully");
+      } else {
+        // Handle failure (you may want to reset the status in the UI)
+        console.log("Transaction verification failed");
+      }
+    } catch (error) {
+      // Handle errors (e.g., network issues, server errors)
+      console.log("An error occurred while verifying the transaction");
+    }
   };
 
-  const handleReject = (id) => {
-    const updatedTransactions = pendingTransactions.map((txn) =>
-      txn._id === id ? { ...txn, status: "Rejected" } : txn
-    );
-    setPendingTransactions(updatedTransactions);
+  const handleReject = async (id) => {
+    try {
+      // Make PATCH request to API
+      const response = await axios.patch("http://localhost:3000/api/customers/transactions", {
+        oid: id, // Object ID of the transaction
+        verified: false, // Set verified to false for rejection
+      }, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: sessionStorage.getItem("token"), // Include token if required
+        }
+      });
+
+      if (response.data.message === "Update successful") {
+        // Handle success if needed
+        fetchTransactions();
+        //console.log("Transaction rejected successfully");
+      } else {
+        // Handle failure (you may want to reset the status in the UI)
+        console.log("Transaction rejection failed");
+      }
+    } catch (error) {
+      // Handle errors (e.g., network issues, server errors)
+      console.log("An error occurred while rejecting the transaction");
+    }
   };
 
   const handleLogout = () => {
