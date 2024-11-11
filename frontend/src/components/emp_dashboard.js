@@ -47,6 +47,7 @@ const Dashboard = () => {
       email: item.sender,
       receiver: item.receiver,
       provider: item.provider,
+      currency: item.currency,
       amount: item.amount,
       status: item.verified === true ? "Verified" : item.verified === false ? "Rejected" : "Unverified",
     }));

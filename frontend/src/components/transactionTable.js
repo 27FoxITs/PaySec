@@ -97,7 +97,7 @@ const PendingTransactionsTable = ({ transactions, onVerify, onReject }) => {
                 <td>{txn.email}</td>
                 <td>{txn.receiver}</td>
                 <td>{txn.provider}</td>
-                <td>${Number(txn.amount).toFixed(2)}</td>
+                <td>{txn.currency} {Number(txn.amount).toFixed(2)}</td>
                 <td>{txn.status}</td>
                 <td>
                   <button
