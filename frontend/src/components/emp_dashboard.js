@@ -14,9 +14,6 @@ const loadTransactions = async () => {
       headers: {
         Authorization: eToken,
       },
-      params: {
-        key: "auTjU5GWCqmtNJ9aP0ntnpm60nKVvS0nQuNTS915j8kLOUATZUk74ggjvo2fCBwxCQgDT8Bfs1MHUvCFm5qXPw0j32b1uC8U1UvtmxMgqwDQFfvK4pOmLTnbu9N8yYDS",
-      },
     });
 
     if (response.message) {
@@ -26,6 +23,10 @@ const loadTransactions = async () => {
       return response.data;
     }
   } catch (error) {
+    if (error.status === 403) {
+      sessionStorage.setItem("tempError", "Your session has expired. Please login again.");
+      window.location.href = "/login";
+    }
     console.error("Error: ", error);
     return []; // Return empty array in case of error
   }

@@ -3,10 +3,15 @@ import React, { useState } from "react";
 import axios from "axios";
 import "./login.css";
 
+const tempError = sessionStorage.getItem("tempError");
+if (tempError) {
+  sessionStorage.removeItem("tempError");
+}
+
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [error, setError] = useState(tempError);
 
   // RegEx for input validation
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

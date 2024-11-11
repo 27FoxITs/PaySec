@@ -67,6 +67,10 @@ const CustomerTransaction = () => {
                 setError(response.data.message || "Transaction failed");
             }
         } catch (error) {
+            if (error.status === 403) {
+                sessionStorage.setItem("tempError", "Your session has expired. Please login again.");
+                window.location.href = "/login";
+              }
             setError("An error occurred while processing the transaction");
         }
     };
@@ -77,6 +81,10 @@ const CustomerTransaction = () => {
         window.location.href = "/login";
     };
 
+    if (!sessionStorage.getItem("cEmail")) {
+        sessionStorage.setItem("tempError", "Authorisation failed. Please login.");
+        window.location.href = "/login";
+    }
 
     return (
         <div className="transaction-container">
